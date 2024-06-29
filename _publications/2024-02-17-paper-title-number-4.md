@@ -3,9 +3,9 @@ title: "Parallel Small Polynomial Multiplication for Dilithium: A Faster Design 
 collection: publications
 permalink: /publication/2024-02-17-paper-title-number-4
 excerpt: 'This paper is about Dilithium Optimization Implementation.'
-date: 2024-02-17
-venue: 'ACSAC '23: Proceedings of the 39th Annual Computer Security Applications Conference'
-paperurl: '[http://academicpages.github.io/files/paper3.pdf](https://dl.acm.org/doi/abs/10.1145/3564625.3564629)'
+date: 2022-12-05
+venue: 'ACSAC23: Proceedings of the 39th Annual Computer Security Applications Conference'
+paperurl: 'https://dl.acm.org/doi/abs/10.1145/3564625.3564629'
 citation: 'Zheng J, He F, Shen S, et al. Parallel small polynomial multiplication for dilithium: A faster design and implementation[C]//Proceedings of the 38th Annual Computer Security Applications Conference. 2022: 304-317.'
 ---
 
