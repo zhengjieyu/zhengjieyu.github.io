@@ -30,16 +30,16 @@ To Appear at **ESORIC 2024**
 Zhichuang Liang, Boyue Fang, **Jieyu Zheng**,  Yunlei Zhao<br>
 **Computer Standards & Interfaces, 2024**
 
-- **Efficient NTTRU Implementation on ARMv8**<br>
+- **Efficient NTTRU Implementation on ARMv8**[[pdf]](https://zhengjieyu.github.io/files/paper5.pdf)<br>
 Zhuo Zhang, **Jieyu Zheng**, Yunlei Zhao<br>
 **ICPADS 2023**<br>
 **Best Poster Award**<br>
 
-- **Optimized Vectorization Implementation of CRYSTALS-Dilithium**<br>
+- **Optimized Vectorization Implementation of CRYSTALS-Dilithium**<br>[[pdf]](https://arxiv.org/pdf/2306.01989)<br>
 **Jieyu Zheng**, Haoliang Zhu, Zhenyu Song, Zheng Wang, Yunlei Zhao<br>
 **CoRR abs/2306.01989 (2023)**
 
-- **Parallel Small Polynomial Multiplication for Dilithium: A Faster Design and Implementation**<br>
+- **Parallel Small Polynomial Multiplication for Dilithium: A Faster Design and Implementation**[[pdf]](https://zhengjieyu.github.io/files/Parallel.pdf)<br>
 **Jieyu Zheng**, Feng He, Shiyu Shen, Chenxi Xue, Yunlei Zhao<br>
 **ACSAC 2022**
 
