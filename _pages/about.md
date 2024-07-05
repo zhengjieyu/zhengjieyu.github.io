@@ -22,11 +22,11 @@ Publication
 **Jieyu Zheng**, Haoliang Zhu, Yifan Dong, Zhenyu Song, Zhenhao Zhang, Yafang Yang, Yunlei Zhao<br>
 To Appear at **ESORIC 2024**
 
-- **ESPM-D: Efficient Sparse Polynomial Multiplication for Dilithium on ARM Cortex-M4 and Apple M2**<br>
+- **ESPM-D: Efficient Sparse Polynomial Multiplication for Dilithium on ARM Cortex-M4 and Apple M2**[[pdf]](https://arxiv.org/pdf/2404.12675)<br>
 **Jieyu Zheng**, Hong Zhang, Le Tian, Zhuo Zhang, Hanyu Wei, Zhiwei Chu, Yafang Yang, Yunlei Zhao<br>
 **CoRR abs/2404.13544 (2024)**
 
-- **Compact and efficient KEMs over NTRU lattices**<br>
+- **Compact and efficient KEMs over NTRU lattices**[[pdf]](https://zhengjieyu.github.io/files/paper3.pdf)<br>
 Zhichuang Liang, Boyue Fang, **Jieyu Zheng**,  Yunlei Zhao<br>
 **Computer Standards & Interfaces, 2024**
 
