@@ -11,8 +11,8 @@ redirect_from:
 
 Education
 ======
-* B.S. in Software School, Nanchang University, 2021
-
+* 2021.9 ~ Present, Ph.D in Cyberspace Security, Fudan University, Supervised by Prof. [Yunlei Zhao](https://cs.fudan.edu.cn/3f/ba/c25909a278458/page.htm).
+* 2017.09 ~ 2021.06, B.S in Information Security, Nanchang University.
 
   
 Skills
