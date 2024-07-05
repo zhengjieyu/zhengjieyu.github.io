@@ -27,7 +27,7 @@ Zhuo Zhang, **Jieyu Zheng**, Yunlei Zhao
 **ICPADS 2023**
 **Best Poster Award**
 
-**Optimized Vectorization Implementation of CRYSTALS-Dilithium**
+- **Optimized Vectorization Implementation of CRYSTALS-Dilithium**
 **Jieyu Zheng**, Haoliang Zhu, Zhenyu Song, Zheng Wang, Yunlei Zhao
 **CoRR abs/2306.01989**
 
