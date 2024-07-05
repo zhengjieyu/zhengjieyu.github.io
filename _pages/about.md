@@ -22,24 +22,24 @@ Publication
 **Jieyu Zheng**, Haoliang Zhu, Yifan Dong, Zhenyu Song, Zhenhao Zhang, Yafang Yang, Yunlei Zhao<br>
 To Appear at **ESORIC 2024**
 
-- **ESPM-D: Efficient Sparse Polynomial Multiplication for Dilithium on ARM Cortex-M4 and Apple M2**[[pdf]](https://arxiv.org/pdf/2404.12675)<br>
+- **ESPM-D: Efficient Sparse Polynomial Multiplication for Dilithium on ARM Cortex-M4 and Apple M2** [[pdf]](https://arxiv.org/pdf/2404.12675)<br>
 **Jieyu Zheng**, Hong Zhang, Le Tian, Zhuo Zhang, Hanyu Wei, Zhiwei Chu, Yafang Yang, Yunlei Zhao<br>
 **CoRR abs/2404.13544 (2024)**
 
-- **Compact and efficient KEMs over NTRU lattices**[[pdf]](https://zhengjieyu.github.io/files/paper3.pdf)<br>
+- **Compact and efficient KEMs over NTRU lattices** [[pdf]](https://zhengjieyu.github.io/files/paper3.pdf)<br>
 Zhichuang Liang, Boyue Fang, **Jieyu Zheng**,  Yunlei Zhao<br>
 **Computer Standards & Interfaces, 2024**
 
-- **Efficient NTTRU Implementation on ARMv8**[[pdf]](https://zhengjieyu.github.io/files/paper5.pdf)<br>
+- **Efficient NTTRU Implementation on ARMv8** [[pdf]](https://zhengjieyu.github.io/files/paper5.pdf)<br>
 Zhuo Zhang, **Jieyu Zheng**, Yunlei Zhao<br>
 **ICPADS 2023**<br>
 **Best Poster Award**<br>
 
-- **Optimized Vectorization Implementation of CRYSTALS-Dilithium**<br>[[pdf]](https://arxiv.org/pdf/2306.01989)<br>
+- **Optimized Vectorization Implementation of CRYSTALS-Dilithium**<be> [[pdf]](https://arxiv.org/pdf/2306.01989)<br>
 **Jieyu Zheng**, Haoliang Zhu, Zhenyu Song, Zheng Wang, Yunlei Zhao<br>
 **CoRR abs/2306.01989 (2023)**
 
-- **Parallel Small Polynomial Multiplication for Dilithium: A Faster Design and Implementation**[[pdf]](https://zhengjieyu.github.io/files/Parallel.pdf)<br>
+- **Parallel Small Polynomial Multiplication for Dilithium: A Faster Design and Implementation** [[pdf]](https://zhengjieyu.github.io/files/Parallel.pdf)<br>
 **Jieyu Zheng**, Feng He, Shiyu Shen, Chenxi Xue, Yunlei Zhao<br>
 **ACSAC 2022**
 
