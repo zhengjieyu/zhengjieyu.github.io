@@ -17,6 +17,7 @@ To Appear at **ESORIC 2024**
 
 - **ESPM-D: Efficient Sparse Polynomial Multiplication for Dilithium on ARM Cortex-M4 and Apple M2**<br>
 **Jieyu Zheng**, Hong Zhang, Le Tian, Zhuo Zhang, Hanyu Wei, Zhiwei Chu, Yafang Yang, Yunlei Zhao
+**CoRR abs/2404.13544 (2024)**
 
 - **Compact and efficient KEMs over NTRU lattices**<br>
 Zhichuang Liang, Boyue Fang, **Jieyu Zheng**,  Yunlei Zhao
@@ -29,6 +30,12 @@ Zhuo Zhang, **Jieyu Zheng**, Yunlei Zhao
 
 - **Optimized Vectorization Implementation of CRYSTALS-Dilithium**<br>
 **Jieyu Zheng**, Haoliang Zhu, Zhenyu Song, Zheng Wang, Yunlei Zhao
-**CoRR abs/2306.01989**
+**CoRR abs/2306.01989 (2023)**
+
+- **Parallel Small Polynomial Multiplication for Dilithium: A Faster Design and Implementation**<br>
+**Jieyu Zheng**, Feng He, Shiyu Shen, Chenxi Xue, Yunlei Zhao
+**ACSAC 2022**
+
+  
 
 
