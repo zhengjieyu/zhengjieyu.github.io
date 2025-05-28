@@ -11,15 +11,13 @@ I'm a second year PhD candidate student supervised by [Yunlei Zhao](https://cs.f
 
 Education
 ======
-* 2021.9 ~ Present, Ph.D in Cyberspace Security, Fudan University, Supervised by [Yunlei Zhao](https://cs.fudan.edu.cn/3f/ba/c25909a278458/page.htm).
 * 2025.2 ~ Present, Research Intern at Max Planck Institute for Security and Privacy (MPI-SP), Supervised by [Peter Schwabe](https://cryptojedi.org/peter/).
+* 2021.9 ~ Present, Ph.D in Cyberspace Security, Fudan University, Supervised by [Yunlei Zhao](https://cs.fudan.edu.cn/3f/ba/c25909a278458/page.htm).
 * 2017.09 ~ 2021.06, B.S in Information Security, Nanchang University.
 
 
 Publication
 ======
-[Google Scholar](https://scholar.google.com/citations?user=1wNJ7usAAAAJ&hl=zh-CN) | [DBLP](https://dblp.org/pid/273/7712.html)
-
 ### 2025
 - **Optimized Vectorization Implementation of CRYSTALS-Dilithium** [[pdf]](https://arxiv.org/pdf/2306.01989)  
   **Jieyu Zheng**, Haoliang Zhu, Zhenyu Song, Zheng Wang, Yunlei Zhao  
