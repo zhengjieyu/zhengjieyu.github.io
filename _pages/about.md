@@ -19,9 +19,9 @@ Education
 Publication
 ======
 ### 2025
-- **Optimized Vectorization Implementation of CRYSTALS-Dilithium** [[pdf]](https://arxiv.org/pdf/2306.01989)  
+- **Optimized Vectorization Implementation of CRYSTALS-Dilithium** [[pdf]](https://ieeexplore.ieee.org/document/11021393)  
   **Jieyu Zheng**, Haoliang Zhu, Zhenyu Song, Zheng Wang, Yunlei Zhao  
-  *To appear in IEEE Transactions on Dependable and Secure Computing (TDSC), 2025*  
+  *IEEE Transactions on Dependable and Secure Computing (TDSC), 2025*  
 
 - **Efficient NTTRU TLS 1.3 for IoT Devices** [[pdf]](https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10938997)  
   Zhuo Zhang, Zhenyu Song, **Jieyu Zheng**, Yunlei Zhao  
