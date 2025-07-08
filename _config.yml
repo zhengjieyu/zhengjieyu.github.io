@@ -10,7 +10,7 @@
 locale                   : "en-US"
 title                    : "Jieyu Zheng"
 title_separator          : "-"
-name                     : &name "Jieyu Zheng (郑婕妤）"
+name                     : &name "Jieyu Zheng"
 description              : &description "personal description"
 url                      : https://zhengjieyu.github.io # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
 baseurl                  : "" # the subpath of your site, e.g. "/blog"
@@ -22,7 +22,7 @@ repository               : "zhengjieyu/zhengjieyu.github.io"
 author:
   # Biographic information
   avatar           : "profile.png"
-  name             : "Jieyu Zheng"
+  name             : "Jieyu Zheng (郑婕妤）"
   pronouns         : # example: "she/her"  
   bio              : "PhD Candidate"
   location         : "Shanghai, China"
