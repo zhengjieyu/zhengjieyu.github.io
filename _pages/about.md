@@ -7,7 +7,7 @@ redirect_from:
   - /about.html
 ---
 
-I'm a fourth year PhD candidate student supervised by [Yunlei Zhao](https://cs.fudan.edu.cn/3f/ba/c25909a278458/page.htm) at school of computer science, Fudan Unversity. My research interest lies in post-quantum cryptography, cryptographic engineering, post-quantum TLS.
+I'm a fourth year PhD candidate student supervised by [Yunlei Zhao](https://cs.fudan.edu.cn/3f/ba/c25909a278458/page.htm) at school of computer science, Fudan Unversity. My research interest lies in post-quantum cryptography, cryptographic engineering, post-quantum TLS, high-assurance cryptographic engineering, machine-checked cryptography.
 
 Education
 ======
