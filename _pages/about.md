@@ -18,6 +18,11 @@ Education
 
 Publication
 ======
+### 2026
+- **Lightweight PQ KEM and Hybrid MQTT Protocol for 8-bit AVR Sensor Nodes** [[pdf]](https://eprint.iacr.org/2026/248)  
+  Yifan Dong, YoungBeom Kim, **Jieyu Zheng**, Zhichuang Liang, Boyue Fang, Seog Chung Seo, Máire O'Neill, Yunlei Zhao  
+  *Conference on Cryptographic Hardware and Embedded Systems (CHES), 2026*
+
 ### 2025
 - **Optimized Vectorization Implementation of CRYSTALS-Dilithium** [[pdf]](https://ieeexplore.ieee.org/document/11021393)  
   **Jieyu Zheng**, Haoliang Zhu, Zhenyu Song, Zheng Wang, Yunlei Zhao  
