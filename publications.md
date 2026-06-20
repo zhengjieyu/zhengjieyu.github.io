@@ -5,6 +5,20 @@
 <div class="publication-card">
     <div class="publication-content">
         <h3 class="publication-title">
+            DTRU: A Versatile, Compact, Simple, and Robust NTRU KEM with Double <code>E_8</code> Encoding
+        </h3>
+        <div class="publication-venue">Accepted by ESORICS 2026</div>
+        <div class="publication-authors">Hengchuan Zou, Songlin Li, <strong>Jieyu Zheng</strong>, Xiaowen Hu, Hanyu Wei, Weizhi Ao, Yifan Dong, Wenbo Guo, Yunlei Zhao</div>
+        <div class="publication-year">2026</div>
+        <div class="publication-tags">
+            <span class="tag tag-safety">Post-Quantum Cryptography</span>
+        </div>
+    </div>
+</div>
+
+<div class="publication-card">
+    <div class="publication-content">
+        <h3 class="publication-title">
             <a href="https://eprint.iacr.org/2026/248" class="publication-link">
                 Lightweight PQ KEM and Hybrid MQTT Protocol for 8-bit AVR Sensor Nodes
             </a>

@@ -25,4 +25,4 @@
   </div>
 </div>
 
-I'm a fifth year **PhD candidate** supervised by [Yunlei Zhao](https://cs.fudan.edu.cn/3f/ba/c25909a278458/page.htm) at the School of Computer Science, Fudan University. My research focuses on post-quantum cryptography, cryptographic engineering, post-quantum TLS, and high-assurance / machine-checked cryptography.
+I recently completed my Ph.D. at the School of Computer Science, Fudan University, under the supervision of [Yunlei Zhao](https://cs.fudan.edu.cn/3f/ba/c25909a278458/page.htm). I will soon join the Max Planck Institute for Security and Privacy (MPI-SP) as a postdoctoral researcher and am currently waiting for my visa. My research focuses on post-quantum cryptography, cryptographic engineering, post-quantum TLS, and high-assurance / machine-checked cryptography.

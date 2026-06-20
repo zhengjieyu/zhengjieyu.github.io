@@ -17,7 +17,7 @@
     <div class="timeline-header">
       <span class="timeline-org">Fudan University</span>
       <span class="timeline-role">Ph.D. in Cyberspace Security</span>
-      <span class="timeline-dates">Sep 2021 – <strong class="text-accent">Present</strong></span>
+      <span class="timeline-dates">Sep 2021 – Jun 2026</span>
     </div>
     <div class="timeline-desc">Supervised by Yunlei Zhao. Research on post-quantum cryptography.</div>
   </div>
