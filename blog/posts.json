@@ -1,0 +1,14 @@
+[
+  {
+    "slug": "pqc-implementation-guide",
+    "date": "2026-09-25",
+    "title": {
+      "en": "Engineering PQC Implementations: From the NIST Call to Implementation Pitfalls, Side Channels, and Testing",
+      "zh": "PQC 方案实现工程教程：从 NIST 征集到实现陷阱、侧信道与测试"
+    },
+    "summary": {
+      "en": "Lessons from NIST, KpqC, and the first NGCC round on where PQC implementations break, how to defend against side channels, and how to test against the spec. Ends with a pre-submission checklist.",
+      "zh": "结合 NIST、KpqC 与 NGCC 首轮的经验，梳理 PQC 实现最常出错的地方、侧信道防护与 spec 一致性测试，并附提交前自查清单。"
+    }
+  }
+]
