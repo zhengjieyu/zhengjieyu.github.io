@@ -1,5 +1,3 @@
-# Publications
-
 ## 2026
 
 <div class="publication-card">

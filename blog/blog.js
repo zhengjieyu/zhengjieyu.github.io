@@ -9,10 +9,6 @@
     function readLang() {
         const param = new URLSearchParams(window.location.search).get('lang');
         if (LANGS.includes(param)) return param;
-        try {
-            const saved = localStorage.getItem('lang');
-            if (LANGS.includes(saved)) return saved;
-        } catch (e) { /* storage unavailable */ }
         return 'en';
     }
 
@@ -29,7 +25,14 @@
         return s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     }
 
+    function localized(value) {
+        return value[lang] || value.zh || value.en || '';
+    }
+
     async function loadPosts(base) {
+        if (window.blogData?.posts) {
+            return [...window.blogData.posts].sort((a, b) => b.date.localeCompare(a.date));
+        }
         const res = await fetch(`${base}posts.json`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const posts = await res.json();
@@ -44,21 +47,47 @@
         const query = lang === 'en' ? '' : `?lang=${lang}`;
         el.innerHTML = `<ul class="post-list">${posts.map(p => `
             <li class="post-item">
-                <time class="post-date" datetime="${p.date}">${formatDate(p.date, lang)}</time>
-                <a class="post-link" href="${base}${p.slug}/${query}">${escapeHtml(p.title[lang] || p.title.en)}</a>
-                <p class="post-summary">${escapeHtml(p.summary[lang] || p.summary.en)}</p>
+                <div class="post-meta"><time class="post-date" datetime="${p.date}">${formatDate(p.date, lang)}</time>${p.readTime ? `<span aria-hidden="true">·</span><span>${lang === 'zh' ? `约 ${p.readTime} 分钟阅读` : `${p.readTime} min read`}</span>` : ''}</div>
+                <a class="post-link" href="${base}${p.slug}/${query}">${escapeHtml(localized(p.title))}</a>
+                <p class="post-summary">${escapeHtml(localized(p.summary))}</p>
             </li>`).join('')}
         </ul>`;
     }
 
     async function renderPost(el) {
-        const res = await fetch(`${lang}.md`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const markdown = await res.text();
+        const postLang = el.dataset.lang || lang;
+        const bundled = window.blogData?.content?.[el.dataset.slug]?.[postLang];
+        let markdown = bundled;
+        if (!markdown) {
+            const res = await fetch(`${postLang}.md`);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            markdown = await res.text();
+        }
         el.innerHTML = window.marked.parse(markdown);
 
         // Stable heading anchors shared by both languages
         el.querySelectorAll('h2, h3').forEach((h, i) => { h.id = `s${i + 1}`; });
+
+        const sections = [...el.querySelectorAll('h2')];
+        if (sections.length > 8) {
+            const contents = document.createElement('details');
+            contents.className = 'post-contents';
+            const summary = document.createElement('summary');
+            summary.textContent = document.documentElement.lang === 'zh-CN' ? '目录' : 'Contents';
+            contents.appendChild(summary);
+            const list = document.createElement('ol');
+            sections.forEach(h => {
+                const item = document.createElement('li');
+                const link = document.createElement('a');
+                link.href = `#${h.id}`;
+                link.textContent = h.textContent;
+                item.appendChild(link);
+                list.appendChild(item);
+            });
+            contents.appendChild(list);
+            const firstHeading = sections[0];
+            firstHeading.parentNode.insertBefore(contents, firstHeading);
+        }
 
         // Wide tables scroll inside their own box on small screens
         el.querySelectorAll('table').forEach(t => {
@@ -83,18 +112,20 @@
     }
 
     async function render() {
-        document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+        const root = document.getElementById('blog-root');
+        const displayLang = root?.dataset.lang || lang;
+        document.documentElement.lang = displayLang === 'zh' ? 'zh-CN' : 'en';
 
         const toggle = document.getElementById('lang-toggle');
         if (toggle) {
+            toggle.hidden = Boolean(root?.dataset.lang);
             toggle.textContent = UI[lang].toggle;
             toggle.setAttribute('aria-label', UI[lang].toggleLabel);
         }
         document.querySelectorAll('[data-i18n]').forEach(n => {
-            n.textContent = UI[lang][n.dataset.i18n];
+            n.textContent = UI[displayLang][n.dataset.i18n];
         });
 
-        const root = document.getElementById('blog-root');
         if (!root) return;
         const base = root.dataset.base || '';
         try {
@@ -114,7 +145,6 @@
 
     function setLang(next) {
         lang = next;
-        try { localStorage.setItem('lang', lang); } catch (e) { /* storage unavailable */ }
         const url = new URL(window.location.href);
         if (lang === 'en') url.searchParams.delete('lang');
         else url.searchParams.set('lang', lang);

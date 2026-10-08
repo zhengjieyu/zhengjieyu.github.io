@@ -1,5 +1,18 @@
 [
   {
+    "slug": "pavona-beginner-guide",
+    "date": "2026-10-08",
+    "readTime": 30,
+    "title": {
+      "en": "From Software to Silicon: A Beginner's Guide to Pavona",
+      "zh": "从软件到芯片：Pavona 入门指南"
+    },
+    "summary": {
+      "en": "A beginner-friendly tour of Pavona's hardware and cryptographic software, with a first ACC program you can run without a board.",
+      "zh": "从 Ibex、ACC 与 KMAC 的分工讲起，了解 Pavona 的密码软件栈，并在没有开发板的情况下运行第一个 ACC 程序。"
+    }
+  },
+  {
     "slug": "pqc-implementation-guide",
     "date": "2026-09-25",
     "title": {

@@ -1,7 +1,7 @@
 // Theme management
 class ThemeManager {
     constructor() {
-        this.theme = localStorage.getItem('theme') || 'light';
+        this.theme = localStorage.getItem('theme') || 'dark';
         this.init();
     }
 
@@ -262,7 +262,7 @@ class LazyImageLoader {
 // Markdown content loader
 class MarkdownLoader {
     constructor() {
-        this.sections = ['about', 'news', 'publications', 'resume'];
+        this.sections = ['about', 'publications'];
         this.init();
     }
 
@@ -489,7 +489,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.navigationHighlightInstance = new NavigationHighlight();
     
     new LazyImageLoader();
-    new MarkdownLoader();
     
     // Apply hover effect to all 'b' letters on initial content
     if (typeof window.applyBHoverEffect === 'function') {
