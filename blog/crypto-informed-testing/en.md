@@ -40,7 +40,7 @@ What the paper does is carry this approach over from hash functions to KEMs and 
 
 The standard security goal for a KEM is IND-CCA. Roughly: an attacker may ask the system to decapsulate any ciphertext except the one being attacked, and still learns nothing about the key inside that one.
 
-Back to NTRU. The attacker takes the target ciphertext and changes one padding bit. That gives a "different" ciphertext, which the attacker is allowed to submit for decapsulation, and the system returns the target key. So the bug does not just weaken the scheme. It breaks IND-CCA outright.
+Back to NTRU. The attacker takes the target ciphertext and changes one padding bit. That gives a "different" ciphertext, which the attacker is allowed to submit for decapsulation, and the system returns the target key. So this one bug is enough to break IND-CCA.
 
 Read the other way around, IND-CCA gives a test rule: change any bit of a valid ciphertext, and decapsulation must return a different key.
 
