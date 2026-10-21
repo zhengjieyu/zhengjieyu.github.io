@@ -4,7 +4,7 @@
 
 最近读了 Fenzi、Gilcher 和 Virdia 发在 TCHES 2026 上的一篇论文（[论文](https://doi.org/10.46586/tches.v2026.i1.425-447)、[代码](https://github.com/jangilcher/cryptoTesting)），讲的是怎么测试密码算法的实现。读它的原因很简单：这段时间一直在看 NGCC 首轮的公开评审，里面有一类实现问题反复出现，而这篇论文给了一个专门找这类问题的办法。
 
-先看论文里的一个例子。LibOQS 是用得比较多的后量子密码 C 库，2020 年的 0.4.0 版本里收录了 NTRU 这个 KEM。NTRU 的密文长度不是整字节，最后一个字节有 4 位是填充，规范要求填 0，但解封装代码没有检查这 4 位。结果就是把其中任意一位改掉，密文照样能解封装，解出来的还是原来那个密钥。
+先看论文里的一个例子。[LibOQS](https://github.com/open-quantum-safe/liboqs) 是 Open Quantum Safe 项目维护的后量子密码 C 库（[Stebila、Mosca](https://doi.org/10.1007/978-3-319-69453-5_2)），用得比较多，2020 年的 0.4.0 版本里收录了 NTRU 这个 KEM。NTRU 的密文长度不是整字节，最后一个字节有 4 位是填充，规范要求填 0，但解封装代码没有检查这 4 位。结果就是把其中任意一位改掉，密文照样能解封装，解出来的还是原来那个密钥。
 
 对 KEM 来说这是个严重问题，第 3 节会解释原因。可它当时并没有被常规测试发现。程序不崩溃，KAT 也都能通过，因为 KAT 里的密文全是合法的。
 
@@ -218,6 +218,7 @@ int main(int argc, char **argv) {
 ## 来源
 
 - Fenzi, Gilcher, Virdia，“Finding Bugs and Features Using Cryptographically-Informed Functional Testing”，[TCHES 2026(1), pp. 425–447](https://doi.org/10.46586/tches.v2026.i1.425-447)；[ePrint 2024/1122](https://eprint.iacr.org/2024/1122)；[代码](https://github.com/jangilcher/cryptoTesting)。论文 Table 3 列出了每个测试、每个版本的完整结果。
+- Stebila, Mosca，“Post-quantum Key Exchange for the Internet and the Open Quantum Safe Project”，[SAC 2016](https://doi.org/10.1007/978-3-319-69453-5_2)；[liboqs 代码仓库](https://github.com/open-quantum-safe/liboqs)
 - Mouha, Raunak, Kuhn, Kacker，“Finding Bugs in Cryptographic Hash Function Implementations”，[IEEE Transactions on Reliability 67(3), 2018](https://doi.org/10.1109/TR.2018.2847247)
 - Weyuker，“On Testing Non-Testable Programs”，[The Computer Journal 25(4), 1982](https://doi.org/10.1093/comjnl/25.4.465)
 - Chen, Cheung, Yiu，“Metamorphic Testing: A New Approach for Generating Next Test Cases”，[arXiv:2002.12543](https://arxiv.org/abs/2002.12543)（1998 年技术报告）

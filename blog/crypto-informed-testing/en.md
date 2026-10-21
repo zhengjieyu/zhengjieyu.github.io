@@ -4,7 +4,7 @@
 
 I recently read a TCHES 2026 paper by Fenzi, Gilcher, and Virdia ([paper](https://doi.org/10.46586/tches.v2026.i1.425-447), [code](https://github.com/jangilcher/cryptoTesting)) on how to test implementations of cryptographic algorithms. My reason for reading it was simple. I have been going through the public review of the first NGCC round, and one kind of implementation bug keeps coming up there. This paper describes a method aimed at exactly that kind of bug.
 
-Here is one of the paper's examples. LibOQS is a fairly widely used C library of post-quantum algorithms, and version 0.4.0, from 2020, included the NTRU KEM. NTRU ciphertexts are not a whole number of bytes long, so the last byte has 4 padding bits, which the specification says must be zero. The decapsulation code did not check them. If you changed any of those bits, the ciphertext still decapsulated, and it gave back the original key.
+Here is one of the paper's examples. [LibOQS](https://github.com/open-quantum-safe/liboqs) is a fairly widely used C library of post-quantum algorithms, maintained by the Open Quantum Safe project ([Stebila and Mosca](https://doi.org/10.1007/978-3-319-69453-5_2)), and version 0.4.0, from 2020, included the NTRU KEM. NTRU ciphertexts are not a whole number of bytes long, so the last byte has 4 padding bits, which the specification says must be zero. The decapsulation code did not check them. If you changed any of those bits, the ciphertext still decapsulated, and it gave back the original key.
 
 For a KEM that is a serious problem, and Section 3 explains why. But ordinary testing did not catch it. Nothing crashed, and the known-answer tests passed, because every ciphertext in them was valid.
 
@@ -218,6 +218,7 @@ My earlier [post on engineering PQC implementations](../pqc-implementation-guide
 ## Sources
 
 - Fenzi, Gilcher, Virdia, "Finding Bugs and Features Using Cryptographically-Informed Functional Testing", [TCHES 2026(1), pp. 425–447](https://doi.org/10.46586/tches.v2026.i1.425-447); [ePrint 2024/1122](https://eprint.iacr.org/2024/1122); [code](https://github.com/jangilcher/cryptoTesting). Table 3 of the paper has the full results per test and version.
+- Stebila, Mosca, "Post-quantum Key Exchange for the Internet and the Open Quantum Safe Project", [SAC 2016](https://doi.org/10.1007/978-3-319-69453-5_2); [liboqs on GitHub](https://github.com/open-quantum-safe/liboqs)
 - Mouha, Raunak, Kuhn, Kacker, "Finding Bugs in Cryptographic Hash Function Implementations", [IEEE Transactions on Reliability 67(3), 2018](https://doi.org/10.1109/TR.2018.2847247)
 - Weyuker, "On Testing Non-Testable Programs", [The Computer Journal 25(4), 1982](https://doi.org/10.1093/comjnl/25.4.465)
 - Chen, Cheung, Yiu, "Metamorphic Testing: A New Approach for Generating Next Test Cases", [arXiv:2002.12543](https://arxiv.org/abs/2002.12543) (technical report from 1998)
