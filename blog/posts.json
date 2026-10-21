@@ -2,14 +2,14 @@
   {
     "slug": "crypto-informed-testing",
     "date": "2026-10-21",
-    "readTime": 35,
+    "readTime": 20,
     "title": {
       "en": "Flip One Bit: What Cryptographically-Informed Testing Finds in PQC Implementations",
       "zh": "翻转一个比特：密码学感知测试在 PQC 实现里找到了什么"
     },
     "summary": {
-      "en": "Reading notes on a TCHES 2026 paper that turns IND-CCA and strong unforgeability into bit-flip tests: the framework, case studies from NTRU, Falcon, SNOVA, CROSS and KNOT-384, the surprising \"features\" of FO and Dilithium, and a checklist for your own code.",
-      "zh": "解读一篇 TCHES 2026 论文：把 IND-CCA 与强不可伪造写成比特翻转测试。框架、NTRU/Falcon/SNOVA/CROSS/KNOT-384 案例、FO 与 Dilithium 的“意外特性”，以及一份自查清单。"
+      "en": "A ciphertext with one flipped bit should never decrypt to the same key. This post explains a simple testing method built on that idea, the real bugs it found in NTRU, Falcon, SNOVA, CROSS and KNOT-384, and how to apply it to your own code.",
+      "zh": "翻转密文的一位，绝不应该解出同一个密钥。本文介绍基于这个想法的一种简单测试方法、它在 NTRU、Falcon、SNOVA、CROSS、KNOT-384 中找到的真实 bug，以及如何用在自己的代码上。"
     }
   },
   {
