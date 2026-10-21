@@ -1,6 +1,6 @@
 # Flip One Bit: What Cryptographically-Informed Testing Finds in PQC Implementations
 
-*For anyone who writes or tests cryptographic code · ~20 min read · October 21, 2026*
+*For anyone who writes or tests cryptographic code · ~25 min read · October 21, 2026*
 
 Here is a real bug. In 2020, the NTRU key encapsulation code in LibOQS (a widely used C library of post-quantum schemes) had a ciphertext whose last byte contained four unused bits. The code ignored those bits. So if you changed one of them, the changed ciphertext still decrypted to the original secret key. The code passed all its known-answer tests, and it never crashed. Yet this one detail meant the scheme no longer had the security property it claimed.
 
@@ -18,6 +18,7 @@ The main points:
 2. **Most real bugs are about encoding.** The same value could be written as more than one byte string, and the code accepted all of them. NTRU, Falcon, SNOVA, and CROSS all had this kind of bug.
 3. **The method is cheap.** It is a short loop around the function you want to test. A full run over one library version takes about half a day on a server.
 4. **Not every finding is a bug.** Some surprising results come from how the schemes are designed. The paper separates these from real bugs, and so does this post.
+5. **The idea can go further than the paper.** Section 9 adds eight more checks of the same kind. Each one is based on a bug that was published in the public review of China's NGCC competition and that the paper's tests would miss.
 
 This post follows on from my earlier post, [Engineering PQC Implementations](../pqc-implementation-guide/). That post lists eleven kinds of tests a PQC implementation needs (its Section 7.1). This post looks at one of them, metamorphic testing, in detail.
 
@@ -251,15 +252,147 @@ In LibOQS 0.4.0, some Rainbow and Falcon public keys could be changed so that an
 - **It does not check whether the code matches the specification.** For that you still need an independent model of the specification and a comparison of intermediate values.
 - **The counts are not bug counts.** They include repeated cases and expected results (Section 5).
 
-So this method does not replace normal fuzzing. It adds a check that normal fuzzing cannot do.
+So this method does not replace normal fuzzing. It adds a check that normal fuzzing cannot do. Section 9 shows how to close some of these gaps.
 
-## 9. Using it on your own code
+## 9. Going further: more relations to test
 
-### 9.1 Run the authors' code
+The paper uses one kind of relation: the output for a changed input must be equal to, or different from, the original output. Many more relations follow the same principle. You still do not need to know the correct output. You only compare outputs with each other.
+
+To find out which relations are worth adding, I looked at the published findings from the first round of China's NGCC competition on [ngcc.dev](https://ngcc.dev/), a public review site run by Markku-Juhani Saarinen (413 findings by October 2026). Several of those bugs are close to what the paper tests, but the paper's tests would not find them. Each subsection below describes one such gap, a published bug that falls into it, and a check that would find it. The finding IDs link to the full reports.
+
+### 9.1 Compare changed outputs with each other, not only with the original
+
+**The gap.** Test 7 only checks that a changed ciphertext gives a key *different from the real key*. But in a KEM with implicit rejection, the key for an invalid ciphertext must also look random. A key that differs from the real key can still be wrong.
+
+**Published bugs.**
+
+- **CheetahKEM** ([kem-09-1](https://ngcc.dev/reports/kem-09.html)) and **LoongKEM** ([kem-18-1](https://ngcc.dev/reports/kem-18.html)): the code that chooses between the real key and the rejection key used a wrong mask. For an invalid ciphertext, it returned a mix of both, so most bits of the real key leaked. The returned key is different from the real key, so Test 7 passes.
+- **BAG-Loong** ([kem-03-2](https://ngcc.dev/reports/kem-03.html)), **CheetahKEM** ([kem-09-4](https://ngcc.dev/reports/kem-09.html)) and **DKEM** ([kem-13-1](https://ngcc.dev/reports/kem-13.html), which I reported): the rejection key was computed from only part of the received ciphertext, or from the re-encrypted ciphertext instead of the received one. So different invalid ciphertexts can get the same rejection key. Each one still differs from the real key, so Test 7 passes. In CheetahKEM, this was enough to recover the secret key from decapsulation queries.
+
+**The check.** Collect the keys from all changed ciphertexts and test two rules:
+
+1. **No two changed ciphertexts give the same key.** A collision means the rejection key ignores part of the ciphertext.
+2. **No rejection key looks like the real key.** Two unrelated 256-bit keys agree in about half of their bits. If a rejection key agrees with the real key in far more bits, part of the real key is leaking.
+
+This is close to what Mouha et al. originally did for hash functions: they collected all outputs and looked for any collision. The paper compares each output only with the original, because that fits how AFL++ works, and loses this ability.
+
+### 9.2 The return code must not depend on validity
+
+**The gap.** The paper treats the return code as part of the output. For a changed ciphertext, the output is expected to change, so a changed return code passes the test.
+
+**Published bug.** **DTRU** ([kem-14-2](https://ngcc.dev/reports/kem-14.html)): decapsulation returned a different code when it took the implicit-rejection branch. This tells an attacker whether a ciphertext was valid, which is exactly what implicit rejection is meant to hide.
+
+**The check.** For a KEM that claims implicit rejection, the return code for every changed ciphertext must be the same as for the valid ciphertext. For a KEM with explicit rejection, the documentation must say so.
+
+### 9.3 Change values, not only bits
+
+**The gap.** Many encodings store numbers modulo `q` (or a prime `p`). If the decoder accepts `x + q` as another way to write `x`, there are two byte strings for the same value. Flipping one bit changes a number by a power of two, never by exactly `q`, so single bit flips cannot find this.
+
+**Published bugs.** **QIMEN-PIKE** ([kem-31-2](https://ngcc.dev/reports/kem-31.html)): the decoder reduced field elements modulo `p` without rejecting values of `p` or more, so a ciphertext could be changed without changing the key. This broke IND-CCA. **TSUOV** ([sign-31-6](https://ngcc.dev/reports/sign-31.html)) did not reject an unused field value, and **YuanYang.DSA** ([sign-34-2](https://ngcc.dev/reports/sign-34.html)) had public keys with more than one encoding.
+
+**The check.** Describe the input as a list of fields (each field: its bit width and its allowed range), not just as a list of bits. For each field, try the values `q`, `q + 1`, the largest value that fits, and `x + q`. Decoding must either reject the input or give a different output. A simpler and stronger version: decode the input, encode it again, and require the same bytes.
+
+### 9.4 Change every length, in both directions
+
+**The gap.** The paper changes only the signature length, and only to shorter values. KEM functions and key inputs in many APIs also take a length.
+
+**Published bugs.** **DTRU** ([kem-14-1](https://ngcc.dev/reports/kem-14.html)): a caller-declared ciphertext length could overflow a stack buffer in decapsulation. **Rudraksh2** ([kem-34-3](https://ngcc.dev/reports/kem-34.html)): the KEM functions ignored the declared lengths and read past a short buffer. **Tins** ([sign-29-3](https://ngcc.dev/reports/sign-29.html)): an unchecked, too long signature length overflowed a buffer in the verifier.
+
+**The check.** For every length argument, try 0, the correct length minus one, the correct length plus one, and a much larger value. Each call must return an error without crashing. Run these tests with AddressSanitizer, because a short buffer read does not always crash.
+
+### 9.5 Changes that follow the structure of the scheme
+
+**The gap.** Some changes keep the input well formed and only make sense if you know the scheme. Random bit flips almost never produce them.
+
+**Published bugs.**
+
+- **TRINE** ([sign-30-5](https://ngcc.dev/reports/sign-30.html)): each response vector in a signature could be replaced by any nonzero multiple of itself, and the signature still verified.
+- **VDOO** ([sign-33-7](https://ngcc.dev/reports/sign-33.html)): in the API format where message and signature are stored together, moving the boundary between them gave a valid signature for a new, shorter or longer message.
+- **Galas** ([sign-12-2](https://ngcc.dev/reports/sign-12.html)) and others: the message length was cut to 32 bits before hashing. A message longer than 4 GiB was hashed as a much shorter one, which allowed forgeries.
+
+**The check.** For each scheme, list the transformations that keep the format valid: multiplying a vector by a scalar, negating a value, moving a boundary, very long inputs. Apply each one to a valid signature or ciphertext. The rule is the same as before: a changed input must not verify, or must not give the same key. This needs some knowledge of the scheme, but only a few lines per transformation.
+
+### 9.6 Compare across processes, not only within one
+
+**The gap.** The randomness tests (Tests 2, 5, 10) run inside one process. If an implementation ignores the random bytes it is given and uses its own internal counter instead, keys made one after another in the same process still differ, so the tests pass.
+
+**Published bug.** **HEP-QC** ([kem-17-1](https://ngcc.dev/reports/kem-17.html)): key generation ignored the random number generator provided through the API. Every new process started from the same internal state and produced the same key pair, so anyone could compute the secret key. The ngcc.dev test program checks this by comparing the first key from several new processes.
+
+**The check.** Start two new processes with different random seeds and compare their first key pair, ciphertext, and signature. They must differ.
+
+### 9.7 Compare implementations with each other
+
+**The gap.** The paper tests each implementation on its own. But a scheme often has a reference version and one or more optimized versions, and bugs can sit in only one of them.
+
+**Published bugs.** **FLIT** ([kem-15-1](https://ngcc.dev/reports/kem-15.html)): the reference and optimized FLIT512 code silently derived different keys. **FLIT** ([kem-15-2](https://ngcc.dev/reports/kem-15.html)): only the AVX2 version had a broken comparison that accepted most invalid ciphertexts. **PolarLAC** ([kem-30-3](https://ngcc.dev/reports/kem-30.html)): a ciphertext made by one version could not be decapsulated by the other.
+
+**The check.** Give every version the same inputs, including all the changed inputs from the tests above. All versions must return the same bytes and the same return codes. This needs no knowledge of the correct output at all: the versions check each other.
+
+### 9.8 For hash functions, compare across lengths
+
+**The gap.** Test 1 compares each changed message with the original message of the same length. Some hash bugs only show between messages of different lengths.
+
+**Published bugs.** **Eijen** ([hash-09-1](https://ngcc.dev/reports/hash-09.html)): the empty message and a message of seven zero bits gave the same hash. **MasterCube** ([hash-17-1](https://ngcc.dev/reports/hash-17.html)): a message of 958 one bits and a message of 959 one bits gave the same hash; this happens at every block boundary.
+
+**The check.** Hash many messages of different lengths, especially lengths near byte and block boundaries and messages that differ only by appended zero bits. Look for any two equal hashes. This is the original bit-contribution test of Mouha et al., applied across lengths.
+
+### 9.9 Summary
+
+| Check | What it adds to the paper's tests | Published example | Needs knowledge of the scheme? |
+|---|---|---|---|
+| Rejection keys compared with each other and with the real key | Finds leaking or non-binding rejection keys | kem-09-1, kem-13-1 | No |
+| Return code independent of validity | Finds rejection-branch leaks | kem-14-2 | Only whether rejection is implicit |
+| Change field values, re-encode | Finds `x` vs `x + q` duplicates | kem-31-2, sign-31-6 | Field widths and moduli |
+| Every length, both directions | Finds ignored or unchecked lengths | kem-14-1, kem-34-3, sign-29-3 | No |
+| Structured changes | Finds scalar multiples, boundary shifts, long inputs | sign-30-5, sign-33-7, sign-12-2 | Yes |
+| Compare across processes | Finds ignored random number generators | kem-17-1 | No |
+| Compare implementations | Finds bugs in only one version | kem-15-1, kem-15-2, kem-30-3 | No |
+| Hash collisions across lengths | Finds padding and length bugs | hash-09-1, hash-17-1 | No |
+
+Five of the eight checks need no knowledge of the scheme. They can run automatically on every candidate of a competition, just like the paper's tests.
+
+Here is a sketch of the first check (Section 9.1), as an addition to the Test 7 program in Section 10.2. Like that program, it has not been compiled against a specific liboqs version.
+
+```c
+/* Section 9.1: rejection keys from different changed ciphertexts must all
+   differ from each other, and none may share too many bits with the real key. */
+static int check_rejection_keys(OQS_KEM *kem, uint8_t *c, const uint8_t *sk,
+                                const uint8_t *real_key) {
+    size_t clen = kem->length_ciphertext, sslen = kem->length_shared_secret;
+    size_t n = 8 * clen;                     /* one changed ciphertext per bit */
+    uint8_t *keys = malloc(n * sslen);
+    int bad = 0;
+
+    for (size_t bit = 0; bit < n; bit++) {
+        flip(c, bit);
+        OQS_KEM_decaps(kem, keys + bit * sslen, c, sk);
+        flip(c, bit);
+        size_t same = 0;                     /* bits equal to the real key */
+        for (size_t i = 0; i < sslen; i++)
+            same += 8 - __builtin_popcount(keys[bit * sslen + i] ^ real_key[i]);
+        if (4 * same > 3 * 8 * sslen) {      /* about half is normal */
+            printf("bit %zu: rejection key shares %zu bits with the real key\n", bit, same);
+            bad++;
+        }
+    }
+    for (size_t i = 0; i < n; i++)
+        for (size_t j = i + 1; j < n; j++)
+            if (memcmp(keys + i * sslen, keys + j * sslen, sslen) == 0) {
+                printf("bits %zu and %zu: same rejection key\n", i, j);
+                bad++;
+            }
+    free(keys);
+    return bad;
+}
+```
+
+## 10. Using it on your own code
+
+### 10.1 Run the authors' code
 
 The [authors' code](https://github.com/jangilcher/cryptoTesting) [source] runs in Docker. `bash run.sh` starts the container. Inside it, `bash reproduce.sh ches_liboqs` repeats the LibOQS 0.14.0 run. Use `cur_liboqs` for 0.8.0, `mid_liboqs` for 0.4.0, `old_liboqs` for 2018, and `supercop` for the hash functions. Add `baseline` to run the normal fuzzer instead.
 
-### 9.2 Write your own Tests 7 and 13
+### 10.2 Write your own Tests 7 and 13
 
 You do not need AFL++ to run the two most important tests. The program below uses the public liboqs API. **It is a sketch: I have not compiled it against a specific liboqs version, so check the API of your version.** Error handling and freeing memory are left out.
 
@@ -359,7 +492,7 @@ Some practical advice:
 - The tests also work as a timing check. Run Test 7 under Valgrind with the secret key marked as undefined memory. Valgrind then reports any branch that depends on the secret key. Every changed ciphertext takes the rejection path, which is where FO timing leaks usually are. For a statistical timing check, see [dudect](https://eprint.iacr.org/2016/1123).
 - Every API wrapper (NIST API, PQClean API, liboqs) is separate code and needs its own tests. The CROSS bug was only in one wrapper.
 
-### 9.3 How this relates to the NGCC findings
+### 10.3 How this relates to the NGCC findings
 
 My [earlier post](../pqc-implementation-guide/) sorted the implementation problems found in the first round of China's NGCC competition into nine categories. These tests cover some of them and not others:
 
@@ -371,7 +504,7 @@ My [earlier post](../pqc-implementation-guide/) sorted the implementation proble
 | 3. Randomness problems | Partly (Tests 2, 5, 10) | Finds infinite loops on bad random bytes |
 | 1, 6, 7, 8, 9 (security budget, spec mismatch, state, protocol, debug code) | No | These need other checks, such as an independent model of the spec |
 
-## 10. Checklist
+## 11. Checklist
 
 Each item comes from a real finding above. They add to sections B, C, and E of the [checklist in my earlier post](../pqc-implementation-guide/).
 
@@ -379,16 +512,20 @@ Each item comes from a real finding above. They add to sections B, C, and E of t
 
 - [ ] If data does not fill the last byte, decoding rejects non-zero unused bits (NTRU, SNOVA)
 - [ ] Each value has exactly one accepted encoding; "−0" and similar duplicates are rejected (Falcon)
+- [ ] Values of `q` or more in a field are rejected (Section 9.3)
 - [ ] Decoding and then re-encoding gives the same bytes; otherwise the input is rejected
 
 **Lengths and buffers**
 
 - [ ] Every length argument is checked; a wrong length is rejected (CROSS)
+- [ ] Every length argument is tested with 0, one too few, one too many, and a much larger value, under AddressSanitizer (Section 9.4)
 - [ ] The output does not depend on bytes outside the input, tested with guard bytes at many lengths (KNOT-384)
 
 **KEMs**
 
 - [ ] Flipping any ciphertext bit changes the key, or gives an error that reveals nothing secret (Test 7)
+- [ ] Different invalid ciphertexts give different rejection keys, and no rejection key shares an unusual number of bits with the real key (Section 9.1)
+- [ ] With implicit rejection, the return code is the same for valid and invalid ciphertexts (Section 9.2)
 - [ ] Decapsulation never crashes or hangs on a changed ciphertext (Big Quake, LEDAkem, LIMA)
 - [ ] If decapsulation skips the byte-by-byte re-encryption check, the encoding is checked in another way (NTRU)
 - [ ] The documentation says which parts of the secret key are unused for valid ciphertexts (FO `z`)
@@ -401,11 +538,12 @@ Each item comes from a real finding above. They add to sections B, C, and E of t
 **Random numbers and robustness**
 
 - [ ] A broken random number generator leads to an error or a limited number of retries, never an infinite loop (Tests 2, 5, 10)
+- [ ] Two new processes with different random seeds produce different keys, ciphertexts, and signatures (Section 9.6)
 - [ ] Tests compare return values as well as output bytes
 
 **Process**
 
-- [ ] Tests 7 and 13 run in CI on every version of the code (reference and optimized), with identical results
+- [ ] Tests 7 and 13 run in CI on every version of the code (reference and optimized), with identical results (Section 9.7)
 - [ ] Every API wrapper has its own negative tests
 
 ## Appendix A. Full results
@@ -479,4 +617,5 @@ Normal fuzzer, crashes (hangs in parentheses):
 - [NTRU fix: "Ensure trailing bits of ciphertext are 0"](https://github.com/jschanck/ntru/commit/6bb52396fed494001228ca579f4c1d91ef558171) [source]
 - [liboqs issue #1315: Malleable Falcon signatures](https://github.com/open-quantum-safe/liboqs/issues/1315) [source]
 - [CROSS-lib-oqs issue #1: Potential SUF-CMA violation](https://github.com/CROSS-signature/CROSS-lib-oqs/issues/1) [source]
+- [ngcc.dev](https://ngcc.dev/), public review of the NGCC Round 1 candidates (findings cited in Section 9 accessed 2026-10-21); [reproduction harness](https://github.com/ngcc-dev/ngcc-harness) [source]
 - [FIPS 203 (ML-KEM)](https://csrc.nist.gov/pubs/fips/203/final) and [FIPS 204 (ML-DSA)](https://csrc.nist.gov/pubs/fips/204/final)
