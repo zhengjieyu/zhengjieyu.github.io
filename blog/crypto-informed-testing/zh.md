@@ -12,7 +12,7 @@
 
 结论先行。先说明几个贯穿全文的术语：
 
-- **Fuzzing（模糊测试）**：用大量自动生成的输入运行程序，记录崩溃。**AFL++** 是常用的 fuzzer。
+- **Fuzzing（模糊测试）**：用大量自动生成的输入运行程序，记录崩溃。**[AFL++](https://www.usenix.org/conference/woot20/presentation/fioraldi)** 是常用的 fuzzer。
 - **IND-CCA**：KEM 的标准安全定义。攻击者可以请求解封装除挑战密文以外的任何密文，但仍无法得到挑战密钥的任何信息。
 - **sUF-CMA（强不可伪造）**：签名的安全定义。攻击者看过若干合法签名后，无法给出任何新的合法“消息–签名”对，包括对已签过的消息再给出另一个签名。
 - **可塑性（malleability）**：本文中指改变了某个输入，输出却没有变化。
@@ -34,9 +34,11 @@
 
 说明：本文是对论文的解读（[TCHES 2026(1), pp. 425–447](https://doi.org/10.46586/tches.v2026.i1.425-447)，[ePrint 2024/1122](https://eprint.iacr.org/2024/1122)，[代码](https://github.com/jangilcher/cryptoTesting)）。标注 \[source\] 的链接在写作时核对过；标注“*我的理解*”的段落是我的解读，不是论文的结论。引用前请复核原文。
 
+本文是之前[《PQC 方案实现工程教程》](../pqc-implementation-guide/?lang=zh)的后续。那篇文章（第 7.1 节）列出了 PQC 实现需要的 11 个测试层次，本文详细介绍其中的第 6 层：性质与变异测试。第 13 节把论文的测试与那篇文章中的 NGCC 问题分类逐一对照。
+
 ## 1. 普通测试为什么漏掉这些 bug
 
-测试一个原语的新实现 `P`，通常有两种办法：复现 KAT 向量，或者在随机输入上与参考实现 `P0` 比对（即差分测试）。两者都默认 `P0` 是对的。没有人测 `P0` 本身，因为它的输出被设计成“看起来随机”：给定 `t` 和 `P0(t)`，你没法判断 `P0(t)` 对不对。哈希函数更难，连可以对照的逆函数都没有。软件测试把这叫做 **oracle problem**（Weyuker, 1982）。这里的测试预言机（test oracle）指判断输出是否正确的任何方法。
+测试一个原语的新实现 `P`，通常有两种办法：复现 KAT 向量，或者在随机输入上与参考实现 `P0` 比对（即差分测试）。两者都默认 `P0` 是对的。没有人测 `P0` 本身，因为它的输出被设计成“看起来随机”：给定 `t` 和 `P0(t)`，你没法判断 `P0(t)` 对不对。哈希函数更难，连可以对照的逆函数都没有。软件测试把这叫做 **oracle problem**（[Weyuker, 1982](https://doi.org/10.1093/comjnl/25.4.465)）。这里的测试预言机（test oracle）指判断输出是否正确的任何方法。
 
 这件事重要，是因为参考实现会被反复复用：后续所有实现都拿它生成的 KAT 做校验，有时它还被直接部署。论文开头举了两个“纸面安全、实现出错”的例子：Java ECDSA 的 “psychic signatures”（[CVE-2022-21449](https://www.cve.org/CVERecord?id=CVE-2022-21449)），以及 Keccak 参考实现的缓冲区溢出（[CVE-2022-37454](https://www.cve.org/CVERecord?id=CVE-2022-37454)）。
 
@@ -54,9 +56,9 @@ fuzzing 有帮助，但只对表现为崩溃的 bug 有效。AFL++ 这类覆盖�
 
 ## 2. 背景：变形测试与 Mouha 等人的工作
 
-**变形测试**（Chen、Cheung、Yiu；Zhou 等）绕开了 oracle problem：你说不出一个输出对不对，但常常说得出**两个**输出之间应满足什么关系。一个测试用例如果没有明显失败，就是“不确定的”（indeterminate）；*变形关系*把不确定的用例变换成可以判定为失败的用例对。以哈希为例：你不知道 `H(x)` 应该是多少，但你知道 `H(x)` 和 `H(x ⊕ e_i)` 必须不同。
+**变形测试**（[Chen、Cheung、Yiu，1998](https://arxiv.org/abs/2002.12543)；[Chen、Tse、Zhou，2003](https://doi.org/10.1016/S0950-5849%2802%2900129-5)）绕开了 oracle problem：你说不出一个输出对不对，但常常说得出**两个**输出之间应满足什么关系。一个测试用例如果没有明显失败，就是“不确定的”（indeterminate）；*变形关系*把不确定的用例变换成可以判定为失败的用例对。以哈希为例：你不知道 `H(x)` 应该是多少，但你知道 `H(x)` 和 `H(x ⊕ e_i)` 必须不同。
 
-论文的起点是 Mouha、Raunak、Kuhn、Kacker（IEEE Transactions on Reliability, 2018）对 86 个 SHA-3 竞赛参考实现做的“事后验尸”，用了三条变形关系：
+论文的起点是 Mouha、Raunak、Kuhn、Kacker（[IEEE Transactions on Reliability, 2018](https://doi.org/10.1109/TR.2018.2847247)）对 86 个 SHA-3 竞赛参考实现做的“事后验尸”，用了三条变形关系：
 
 | 测试 | 关系 | 失败意味着 | 失败数 / 86 |
 | --- | --- | --- | --- |
@@ -79,7 +81,7 @@ fuzzing 有帮助，但只对表现为崩溃的 bug 有效。AFL++ 这类覆盖�
 
 IND-CCA 这一行值得展开。游戏中敌手拿到 `c*` 和一个“要么是 `ss*`、要么是随机值”的密钥，外加一个能解封装除 `c*` 以外任何密文的预言机。如果翻转 `c*` 的一位得到的密文仍能解封装出 `ss*`，敌手就把 `c'` 交给预言机，拿回 `ss*` 直接比较。方案是被彻底打破，而不是有一点点优势。所以对一个声称 IND-CCA 的方案，**哪怕一个** Test 7 反例也是实打实的 bug。
 
-sUF-CMA 这一行更微妙。NIST 并不要求强不可伪造，很多候选也没有声称。但有些构造本身**蕴含**它（Falcon 使用的 GPV hash-and-sign 框架，由 Gentry、Peikert、Vaikuntanathan 提出），有些协议也依赖它，比如把签名当作交易或消息的唯一标识。所以：方案声称或其构造应当提供该性质时，违反是 bug；否则是隐患。
+sUF-CMA 这一行更微妙。NIST 并不要求强不可伪造，很多候选也没有声称。但有些构造本身**蕴含**它（Falcon 使用的 GPV hash-and-sign 框架，由 [Gentry、Peikert、Vaikuntanathan](https://eprint.iacr.org/2007/432) 提出），有些协议也依赖它，比如把签名当作交易或消息的唯一标识。所以：方案声称或其构造应当提供该性质时，违反是 bug；否则是隐患。
 
 ## 4. 从哈希到 KEM 与签名
 
@@ -379,7 +381,7 @@ SUPERCOP 中三个哈希实现不满足第二原像抵抗：`acehash256v1`（SSE
 
 **根因。** Falcon 压缩签名格式把每个系数编码为一个符号位、低 7 位、以及一元编码的高位。解码器接受 `100000001`（“−0”）作为 0 的合法编码，也不检查签名是否用零填充。两者都能产生解码为同一签名的第二种字节串。这在 2022 年 11 月以 [liboqs issue #1315](https://github.com/open-quantum-safe/liboqs/issues/1315) \[source\] 报告，引用了 Falcon 规范 v1.2 的 3.11.2 节和算法 17–18。
 
-**为什么重要。** Falcon 是 GPV hash-and-sign 方案，而 GPV 蕴含强不可伪造（GPV08, Prop. 6.1）。Falcon 设计文档没有说明该性质缺失，用户有理由默认它成立。Falcon 团队已独立发现并在规范 v1.2 中修复；披露后不久，LibOQS 也更新了它的副本。
+**为什么重要。** Falcon 是 GPV hash-and-sign 方案，而 GPV 蕴含强不可伪造（[GPV08](https://eprint.iacr.org/2007/432), Prop. 6.1）。Falcon 设计文档没有说明该性质缺失，用户有理由默认它成立。Falcon 团队已独立发现并在规范 v1.2 中修复；披露后不久，LibOQS 也更新了它的副本。
 
 ### 9.5 SNOVA：尾部未用比特
 
@@ -407,7 +409,7 @@ Test 7 也会在 LibOQS 0.4.0 的 ephemeral ThreeBears、SIKE 变体，以及 `n
 
 ### 10.1 FO 隐式拒绝下，KEM 私钥是可塑的
 
-很多 KEM 用 Fujisaki–Okamoto 变换从被动安全方案构造 IND-CCA 安全。在隐式拒绝变体中（Hofheinz–Hövelmanns–Kiltz），私钥带一个随机串 `z`，只在密文非法时用来派生伪随机密钥。以 ML-KEM 解封装（FIPS 203 算法 18）为例：
+很多 KEM 用 [Fujisaki–Okamoto 变换](https://doi.org/10.1007/3-540-48405-1_34)从被动安全方案构造 IND-CCA 安全。在隐式拒绝变体中（[Hofheinz–Hövelmanns–Kiltz](https://eprint.iacr.org/2017/604)），私钥带一个随机串 `z`，只在密文非法时用来派生伪随机密钥。以 ML-KEM 解封装（FIPS 203 算法 18）为例：
 
 ```text
 m'      ← K-PKE.Decrypt(dk_PKE, c)
@@ -432,9 +434,9 @@ Dilithium 私钥中有一个 256 bit 的 `K`。确定性变体用 `K` 和消息�
 
 ### 10.3 可以被修改的公钥：排他所有权
 
-在 LibOQS 0.4.0 中，Rainbow 和 Falcon 的公钥可以被改成另一个 `pk' ≠ pk`，使合法的 `(pk, m, σ)` 换成 `(pk', m, σ)` 后仍验证通过（Test 11，现已解决）。这类似于打破**保守排他所有权**（CEO，Pornin–Stern 2005）：给定一个合法签名，找到另一个能验证它的公钥。这里攻击者拿不到 `pk'` 的私钥，因此排除了冒名攻击；但它满足**强**变体的条件，即 S-CEO（Cremers 等，“BUFFing signature schemes”，S&P 2021）和 S-UEO（Brendel 等，S&P 2021），这两者不要求敌手知道对应的私钥。
+在 LibOQS 0.4.0 中，Rainbow 和 Falcon 的公钥可以被改成另一个 `pk' ≠ pk`，使合法的 `(pk, m, σ)` 换成 `(pk', m, σ)` 后仍验证通过（Test 11，现已解决）。这类似于打破**保守排他所有权**（CEO，[Pornin–Stern 2005](https://doi.org/10.1007/11496137_10)）：给定一个合法签名，找到另一个能验证它的公钥。这里攻击者拿不到 `pk'` 的私钥，因此排除了冒名攻击；但它满足**强**变体的条件，即 S-CEO（[Cremers 等，“BUFFing signature schemes”，S&P 2021](https://eprint.iacr.org/2020/1525)）和 S-UEO（[Brendel 等，S&P 2021](https://eprint.iacr.org/2020/823)），这两者不要求敌手知道对应的私钥。
 
-这在实际协议中影响多大尚不清楚，论文也没有夸大。Jackson 等（CCS 2019）表明，这类微妙的签名性质确实会打破使用经典签名的真实协议，所以对 PQC 也值得追问。
+这在实际协议中影响多大尚不清楚，论文也没有夸大。[Jackson 等（CCS 2019）](https://eprint.iacr.org/2019/779)表明，这类微妙的签名性质确实会打破使用经典签名的真实协议，所以对 PQC 也值得追问。
 
 ## 11. 与基线逐项对比
 
@@ -456,7 +458,7 @@ Dilithium 私钥中有一个 256 bit 的 `K`。确定性变体用 `K` 和消息�
 - **格式串是一个好的抽象。** 一个 `(长度, 标签)` 列表同时表达“这些比特必须有影响”和“这些比特必须无影响”，守卫字节还能在不增加代码的情况下检测越界读。可以跨原语、跨库复用。
 - **它点出了一类 bug。** NTRU、Falcon、SNOVA、CROSS 是同一模式：解码器对同一个对象接受不止一种字节串。规范往往只用半句话说明规范形式（“填充位为零”），代码里很容易漏，测试起来却很简单。
 - **诚实地区分 bug 与特性。** 200 多个可塑性没有被包装成 200 个漏洞；论文区分了实现 bug、有意为之的性质和出人意料的性质。
-- **易于接入。** LibOQS 和 SUPERCOP 共用 SUPERCOP 风格 API，测试代码只需少量适配。作者建议把这些测试作为可选模式加入 SUPERCOP 和 Project Wycheproof（Google 维护的已知攻击测试向量集），我同意。
+- **易于接入。** LibOQS 和 SUPERCOP 共用 SUPERCOP 风格 API，测试代码只需少量适配。作者建议把这些测试作为可选模式加入 SUPERCOP 和 [Project Wycheproof](https://github.com/C2SP/wycheproof)（Google 维护的已知攻击测试向量集），我同意。
 
 ### 12.2 局限与可以追问的地方
 
@@ -473,12 +475,12 @@ Dilithium 私钥中有一个 256 bit 的 `K`。确定性变体用 `K` 和消息�
 
 1. **在比特翻转之外加结构化篡改。** 对格密码方案，把打包字段里的某个系数编码成 `q`、`q + 1` 或 `2^k − 1`，交换两个 hint 下标，把长度设成最大值。它们正好针对 FIPS 203/204 新增的“解码必须单射”检查（模数检查、hint 顺序）。
 2. **在每个后端上跑同一个格式串。** ref、AVX2、AVX-512、Cortex-M4 在每个篡改输入上都应返回相同的字节*和*相同的返回码。不一致要么是 bug，要么是不同分发路径之间的行为差异。
-3. **与恒定时间检查结合。** 论文建议使用 dudect，它测量两类输入的运行时间并做统计检验。成本更低的第一步是：在 Valgrind 下运行 Test 7 的循环，把私钥标记为未定义内存，Valgrind 会报告所有依赖它的分支和内存地址。每个篡改密文都会走拒绝路径，而 FO 的时序泄露通常出现在这条路径上。
+3. **与恒定时间检查结合。** 论文建议使用 [dudect](https://eprint.iacr.org/2016/1123)，它测量两类输入的运行时间并做统计检验。成本更低的第一步是：在 Valgrind 下运行 Test 7 的循环，把私钥标记为未定义内存，Valgrind 会报告所有依赖它的分支和内存地址。每个篡改密文都会走拒绝路径，而 FO 的时序泄露通常出现在这条路径上。
 4. **在 CI 里放一个小预算。** 只跑 Test 7 和 Test 13、只跑默认参数集，几分钟就能完成，覆盖最要紧的两条性质。
 
 ## 13. 与 NGCC 首轮发现的对照
 
-在之前的[PQC 方案实现工程教程](../pqc-implementation-guide/)里，我把 NGCC 首轮公开评审的 65 条实现类发现分成了 9 类。下表是这些测试能抓到哪些、抓不到哪些。
+在之前的[PQC 方案实现工程教程](../pqc-implementation-guide/?lang=zh)里，我把 NGCC 首轮公开评审的 65 条实现类发现分成了 9 类。下表是这些测试能抓到哪些、抓不到哪些。
 
 | NGCC 类别（前文 5.1 节） | 能否覆盖 | 测试 | 说明 |
 | --- | --- | --- | --- |
@@ -601,7 +603,7 @@ int main(int argc, char **argv) {
 
 ## 15. 自查清单
 
-每一条都对应论文中的一个发现。
+每一条都对应论文中的一个发现。这些条目是对前文 [NGCC 提交前自查清单](../pqc-implementation-guide/?lang=zh) 中 B（KEM / FO）、C（签名）、E（API 与内存）三部分的补充。
 
 **编码**
 
@@ -640,14 +642,23 @@ int main(int argc, char **argv) {
 ## 来源
 
 - Fenzi, Gilcher, Virdia，“Finding Bugs and Features Using Cryptographically-Informed Functional Testing”，[TCHES 2026(1), pp. 425–447](https://doi.org/10.46586/tches.v2026.i1.425-447)；[ePrint 2024/1122](https://eprint.iacr.org/2024/1122)；[代码与复现说明](https://github.com/jangilcher/cryptoTesting) \[source\]
-- Mouha, Raunak, Kuhn, Kacker，“Finding Bugs in Cryptographic Hash Function Implementations”，IEEE Transactions on Reliability 67(3), 2018
+- Mouha, Raunak, Kuhn, Kacker，“Finding Bugs in Cryptographic Hash Function Implementations”，[IEEE Transactions on Reliability 67(3), 2018](https://doi.org/10.1109/TR.2018.2847247)
+- Weyuker，“On Testing Non-Testable Programs”，[The Computer Journal 25(4), 1982](https://doi.org/10.1093/comjnl/25.4.465)
+- Chen, Cheung, Yiu，“Metamorphic Testing: A New Approach for Generating Next Test Cases”，[arXiv:2002.12543](https://arxiv.org/abs/2002.12543)（1998 年技术报告）
+- Chen, Tse, Zhou，“Fault-Based Testing Without the Need of Oracles”，[Information and Software Technology 45(1), 2003](https://doi.org/10.1016/S0950-5849%2802%2900129-5)
+- Fioraldi, Maier, Eißfeldt, Heuse，“AFL++: Combining Incremental Steps of Fuzzing Research”，[USENIX WOOT 2020](https://www.usenix.org/conference/woot20/presentation/fioraldi)
+- Gentry, Peikert, Vaikuntanathan，“Trapdoors for Hard Lattices and New Cryptographic Constructions”，STOC 2008，[ePrint 2007/432](https://eprint.iacr.org/2007/432)
+- Fujisaki, Okamoto，“Secure Integration of Asymmetric and Symmetric Encryption Schemes”，[CRYPTO 1999](https://doi.org/10.1007/3-540-48405-1_34)
+- Hofheinz, Hövelmanns, Kiltz，“A Modular Analysis of the Fujisaki-Okamoto Transformation”，TCC 2017，[ePrint 2017/604](https://eprint.iacr.org/2017/604)
+- Pornin, Stern，“Digital Signatures Do Not Guarantee Exclusive Ownership”，[ACNS 2005](https://doi.org/10.1007/11496137_10)
+- Reparaz, Balasch, Verbauwhede，“Dude, is my code constant time?”，DATE 2017，[ePrint 2016/1123](https://eprint.iacr.org/2016/1123)
 - [NTRU 修复：“Ensure trailing bits of ciphertext are 0”](https://github.com/jschanck/ntru/commit/6bb52396fed494001228ca579f4c1d91ef558171) \[source\]
 - [liboqs issue #1315：Malleable Falcon signatures](https://github.com/open-quantum-safe/liboqs/issues/1315) \[source\]
 - [CROSS-lib-oqs issue #1：Potential SUF-CMA violation](https://github.com/CROSS-signature/CROSS-lib-oqs/issues/1) \[source\]
 - [SUPERCOP 关于 KNOT-384 的报告（存档）](https://web.archive.org/web/20200810000404/https:/bench.cr.yp.to/web-impl/amd64-pmnod003-crypto_hash-knot384.html)
-- Cremers, Düzlü, Fiedler, Fischlin, Janson，“BUFFing Signature Schemes Beyond Unforgeability and the Case of Post-Quantum Signatures”，IEEE S&P 2021
-- Brendel, Cremers, Jackson, Zhao，“The Provable Security of Ed25519: Theory and Practice”，IEEE S&P 2021
-- Jackson, Cremers, Cohn-Gordon, Sasse，“Seems Legit: Automated Analysis of Subtle Attacks on Protocols that Use Signatures”，ACM CCS 2019
+- Cremers, Düzlü, Fiedler, Fischlin, Janson，“BUFFing Signature Schemes Beyond Unforgeability and the Case of Post-Quantum Signatures”，IEEE S&P 2021，[ePrint 2020/1525](https://eprint.iacr.org/2020/1525)
+- Brendel, Cremers, Jackson, Zhao，“The Provable Security of Ed25519: Theory and Practice”，IEEE S&P 2021，[ePrint 2020/823](https://eprint.iacr.org/2020/823)
+- Jackson, Cremers, Cohn-Gordon, Sasse，“Seems Legit: Automated Analysis of Subtle Attacks on Protocols that Use Signatures”，ACM CCS 2019，[ePrint 2019/779](https://eprint.iacr.org/2019/779)
 - Kannwischer, Schwabe, Stebila, Wiggers，“Improving Software Quality in Cryptography Standardization Projects”，[ePrint 2022/337](https://eprint.iacr.org/2022/337)
 - [KpqC 首轮实现安全分析，ePrint 2023/1437](https://eprint.iacr.org/2023/1437)
 - [FIPS 203（ML-KEM）](https://csrc.nist.gov/pubs/fips/203/final) 与 [FIPS 204（ML-DSA）](https://csrc.nist.gov/pubs/fips/204/final)

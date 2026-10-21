@@ -12,7 +12,7 @@ This post covers a TCHES 2026 paper by Giacomo Fenzi, Jan Gilcher, and Fernando 
 
 The main conclusions first. A few terms are used throughout, so they are defined here:
 
-- **Fuzzing** runs a program on many automatically generated inputs and records crashes. **AFL++** is a widely used fuzzer.
+- **Fuzzing** runs a program on many automatically generated inputs and records crashes. **[AFL++](https://www.usenix.org/conference/woot20/presentation/fioraldi)** is a widely used fuzzer.
 - **IND-CCA** is the standard security notion for KEMs: an attacker who can ask for the decapsulation of any ciphertext except the challenge ciphertext still cannot learn anything about the challenge key.
 - **sUF-CMA** (strong unforgeability) is a security notion for signatures: after seeing valid signatures, an attacker cannot produce any new valid message–signature pair, not even a second signature for a message that was already signed.
 - **Malleability** in this post means that an input was changed and the output stayed the same.
@@ -34,9 +34,11 @@ Suggested reading path:
 
 Note: this post is a reading of the paper ([TCHES 2026(1), pp. 425–447](https://doi.org/10.46586/tches.v2026.i1.425-447), [ePrint 2024/1122](https://eprint.iacr.org/2024/1122), [code](https://github.com/jangilcher/cryptoTesting)). Links marked [source] were checked while writing. Paragraphs marked *my reading* are my interpretation rather than claims made in the paper. Please verify against the original before citing.
 
+This post follows on from my earlier post, [Engineering PQC Implementations](../pqc-implementation-guide/). That post lists eleven test layers for PQC implementations (its Section 7.1). This one covers layer 6, property and metamorphic testing, in detail. Section 13 below maps the paper's tests to the NGCC finding categories from that post.
+
 ## 1. Why ordinary tests miss these bugs
 
-A new implementation `P` of a primitive is usually tested in one of two ways. Either it reproduces known-answer vectors, or it is compared against a reference implementation `P0` on random inputs. This second method is called differential testing. Both assume `P0` is correct. Nobody tests `P0` itself, because its output is designed to look random: given `t` and `P0(t)`, there is no way to tell whether `P0(t)` is right. For a hash function it is harder still, since there is no inverse to check against. Software testing calls this the **oracle problem** (Weyuker, 1982). Here, a test oracle is any procedure that decides whether an output is correct.
+A new implementation `P` of a primitive is usually tested in one of two ways. Either it reproduces known-answer vectors, or it is compared against a reference implementation `P0` on random inputs. This second method is called differential testing. Both assume `P0` is correct. Nobody tests `P0` itself, because its output is designed to look random: given `t` and `P0(t)`, there is no way to tell whether `P0(t)` is right. For a hash function it is harder still, since there is no inverse to check against. Software testing calls this the **oracle problem** ([Weyuker, 1982](https://doi.org/10.1093/comjnl/25.4.465)). Here, a test oracle is any procedure that decides whether an output is correct.
 
 This matters because reference implementations are reused. They generate the KATs that every later implementation is checked against, and they are sometimes shipped directly. The paper opens with two examples of what happens when a "secure on paper" scheme meets an incorrect implementation: the "psychic signatures" bug in Java's ECDSA ([CVE-2022-21449](https://www.cve.org/CVERecord?id=CVE-2022-21449)) and the buffer overflow in the Keccak reference code ([CVE-2022-37454](https://www.cve.org/CVERecord?id=CVE-2022-37454)).
 
@@ -54,9 +56,9 @@ The fourth row is the gap this paper fills. A KEM that decapsulates a tampered c
 
 ## 2. Background: metamorphic testing and Mouha et al.
 
-**Metamorphic testing** (Chen, Cheung, Yiu; Zhou et al.) sidesteps the oracle problem. You cannot say whether one output is correct, but you can often say how *two* outputs must relate. A test case is *indeterminate* if it does not obviously fail; a *metamorphic relation* transforms indeterminate cases into pairs that can be classified as failures. For a hash function: you do not know what `H(x)` should be, but you know that `H(x)` and `H(x ⊕ e_i)` must differ.
+**Metamorphic testing** ([Chen, Cheung, Yiu, 1998](https://arxiv.org/abs/2002.12543); [Chen, Tse, Zhou, 2003](https://doi.org/10.1016/S0950-5849%2802%2900129-5)) sidesteps the oracle problem. You cannot say whether one output is correct, but you can often say how *two* outputs must relate. A test case is *indeterminate* if it does not obviously fail; a *metamorphic relation* transforms indeterminate cases into pairs that can be classified as failures. For a hash function: you do not know what `H(x)` should be, but you know that `H(x)` and `H(x ⊕ e_i)` must differ.
 
-The paper builds on Mouha, Raunak, Kuhn, and Kacker (IEEE Transactions on Reliability, 2018), who ran a post-mortem on 86 SHA-3 competition reference implementations with three such relations:
+The paper builds on Mouha, Raunak, Kuhn, and Kacker ([IEEE Transactions on Reliability, 2018](https://doi.org/10.1109/TR.2018.2847247)), who ran a post-mortem on 86 SHA-3 competition reference implementations with three such relations:
 
 | Test | Relation | A failure means | Failed / 86 |
 |---|---|---|---|
@@ -79,7 +81,7 @@ The step from Mouha et al. to KEMs and signatures is to notice that each securit
 
 The IND-CCA row is worth spelling out. In the game, the adversary gets `c*` and a key that is either `ss*` or random, plus an oracle that decapsulates anything except `c*`. If flipping one bit of `c*` gives a ciphertext that still decapsulates to `ss*`, the adversary queries the oracle on `c'`, gets `ss*`, and compares. The scheme is broken outright, not with some small advantage. That is why a single successful Test 7 counterexample on a scheme claiming IND-CCA is a real bug.
 
-The sUF-CMA row is subtler. NIST did not require strong unforgeability, and many candidates do not claim it. But some constructions *imply* it (the GPV hash-and-sign framework of Gentry, Peikert, and Vaikuntanathan, which Falcon uses), and some protocols rely on it, for example when a signature is used as a unique identifier of a transaction or message. A violation is a bug if the scheme claims the property or its construction should provide it, and a hazard otherwise.
+The sUF-CMA row is subtler. NIST did not require strong unforgeability, and many candidates do not claim it. But some constructions *imply* it (the GPV hash-and-sign framework of [Gentry, Peikert, and Vaikuntanathan](https://eprint.iacr.org/2007/432), which Falcon uses), and some protocols rely on it, for example when a signature is used as a unique identifier of a transaction or message. A violation is a bug if the scheme claims the property or its construction should provide it, and a hazard otherwise.
 
 ## 4. From hashes to KEMs and signatures
 
@@ -379,7 +381,7 @@ Three hash implementations in SUPERCOP fail second-preimage resistance: `acehash
 
 **Root cause.** Falcon's compressed signature format encodes each coefficient as a sign bit, the low 7 bits, and the high bits in unary. The decoder accepted `100000001` ("−0") as a valid encoding of 0, and did not check that the signature was zero-padded. Both give a second byte string that decodes to the same signature. This was reported in [liboqs issue #1315](https://github.com/open-quantum-safe/liboqs/issues/1315) [source] in November 2022, citing Section 3.11.2 and Algorithms 17–18 of Falcon specification v1.2.
 
-**Why it matters.** Falcon is a GPV hash-and-sign scheme, and GPV implies strong unforgeability (GPV08, Prop. 6.1). The Falcon design document did not say the property was missing, so users could reasonably expect it. The Falcon team had found the problem independently and fixed it in specification v1.2; LibOQS updated its copy shortly after disclosure.
+**Why it matters.** Falcon is a GPV hash-and-sign scheme, and GPV implies strong unforgeability ([GPV08](https://eprint.iacr.org/2007/432), Prop. 6.1). The Falcon design document did not say the property was missing, so users could reasonably expect it. The Falcon team had found the problem independently and fixed it in specification v1.2; LibOQS updated its copy shortly after disclosure.
 
 ### 9.5 SNOVA: unused trailing bits
 
@@ -407,7 +409,7 @@ This part explains the "Features" in the title, and I found it the most interest
 
 ### 10.1 KEM secret keys are malleable under FO implicit rejection
 
-Many KEMs build IND-CCA security from a passively secure scheme with the Fujisaki–Okamoto transform. In the implicit-rejection variants (Hofheinz–Hövelmanns–Kiltz), the secret key carries a random string `z` that is only used to derive a pseudorandom key when the ciphertext is invalid. Take ML-KEM decapsulation (FIPS 203, Algorithm 18) as an illustration:
+Many KEMs build IND-CCA security from a passively secure scheme with the [Fujisaki–Okamoto transform](https://doi.org/10.1007/3-540-48405-1_34). In the implicit-rejection variants ([Hofheinz–Hövelmanns–Kiltz](https://eprint.iacr.org/2017/604)), the secret key carries a random string `z` that is only used to derive a pseudorandom key when the ciphertext is invalid. Take ML-KEM decapsulation (FIPS 203, Algorithm 18) as an illustration:
 
 ```text
 m'      ← K-PKE.Decrypt(dk_PKE, c)
@@ -432,9 +434,9 @@ Dilithium's secret key contains a 256-bit value `K`. The deterministic variant d
 
 ### 10.3 Public keys that can be modified: exclusive ownership
 
-In LibOQS 0.4.0, Rainbow and Falcon public keys could be changed into a different `pk' ≠ pk` such that a valid `(pk, m, σ)` still verifies as `(pk', m, σ)` (Test 11, since resolved). This resembles a break of **conservative exclusive ownership** (CEO, Pornin–Stern 2005): given a valid signature, find another public key under which it verifies. Here the attacker does not learn a secret key for `pk'`, which rules out impersonation attacks. But it does satisfy the conditions for the **strong** variants, S-CEO (Cremers et al., "BUFFing signature schemes", S&P 2021) and S-UEO (Brendel et al., S&P 2021), which drop the requirement that the adversary knows a matching secret key.
+In LibOQS 0.4.0, Rainbow and Falcon public keys could be changed into a different `pk' ≠ pk` such that a valid `(pk, m, σ)` still verifies as `(pk', m, σ)` (Test 11, since resolved). This resembles a break of **conservative exclusive ownership** (CEO, [Pornin–Stern 2005](https://doi.org/10.1007/11496137_10)): given a valid signature, find another public key under which it verifies. Here the attacker does not learn a secret key for `pk'`, which rules out impersonation attacks. But it does satisfy the conditions for the **strong** variants, S-CEO ([Cremers et al., "BUFFing signature schemes", S&P 2021](https://eprint.iacr.org/2020/1525)) and S-UEO ([Brendel et al., S&P 2021](https://eprint.iacr.org/2020/823)), which drop the requirement that the adversary knows a matching secret key.
 
-How much this matters in deployed protocols is unclear, and the paper does not overclaim. Jackson et al. (CCS 2019) showed that such subtle signature properties do break real protocols for classical schemes, so the question is worth asking for PQC.
+How much this matters in deployed protocols is unclear, and the paper does not overclaim. [Jackson et al. (CCS 2019)](https://eprint.iacr.org/2019/779) showed that such subtle signature properties do break real protocols for classical schemes, so the question is worth asking for PQC.
 
 ## 11. Head-to-head with the baseline
 
@@ -456,7 +458,7 @@ Totals: **13 IND-CCA and 36 sUF-CMA counterexamples** that the baseline did not 
 - **The format string is a good abstraction.** One list of `(length, label)` expresses "these bits must matter" and "these bits must not", and the guard bytes add over-read detection without extra code. It is reusable across primitives and libraries.
 - **It identifies a bug class.** NTRU, Falcon, SNOVA, and CROSS follow one pattern: the decoder accepts more than one byte string for the same object. Specifications often state the canonical form in half a sentence ("padding bits are zero"), which is easy to miss in code and simple to test.
 - **It separates bugs from features honestly.** The 200+ malleabilities are not presented as 200 vulnerabilities. The paper distinguishes implementation bugs, intended properties, and surprising properties.
-- **It is easy to adopt.** LibOQS and SUPERCOP share the SUPERCOP-style API, so the test code needs little adaptation. The authors suggest adding the tests as an optional mode to SUPERCOP and to Project Wycheproof (Google's collection of test vectors for known attacks). I agree.
+- **It is easy to adopt.** LibOQS and SUPERCOP share the SUPERCOP-style API, so the test code needs little adaptation. The authors suggest adding the tests as an optional mode to SUPERCOP and to [Project Wycheproof](https://github.com/C2SP/wycheproof) (Google's collection of test vectors for known attacks). I agree.
 
 ### 12.2 Limitations and open questions
 
@@ -473,7 +475,7 @@ Totals: **13 IND-CCA and 36 sUF-CMA counterexamples** that the baseline did not 
 
 1. **Structured mauls next to bit flips.** For lattice schemes, encode a coefficient as `q`, `q + 1`, or `2^k − 1` in its packed field, swap two hint indices, set a length to its maximum. These target exactly the "decode must be injective" checks that FIPS 203/204 added (modulus check, hint ordering).
 2. **Run the same format string on every backend.** Reference, AVX2, AVX-512, and Cortex-M4 code should return identical bytes *and* identical return codes on every tampered input. A mismatch is either a bug or a timing/behavior difference between dispatch paths.
-3. **Combine with constant-time checks.** The paper suggests dudect, a tool that measures running times on two classes of inputs and applies a statistical test. A cheaper first step is to run the Test 7 loop under Valgrind with the secret key marked as undefined memory; Valgrind then reports every branch or memory address that depends on it. Every tampered ciphertext runs the rejection path, which is where FO timing leaks usually occur.
+3. **Combine with constant-time checks.** The paper suggests [dudect](https://eprint.iacr.org/2016/1123), a tool that measures running times on two classes of inputs and applies a statistical test. A cheaper first step is to run the Test 7 loop under Valgrind with the secret key marked as undefined memory; Valgrind then reports every branch or memory address that depends on it. Every tampered ciphertext runs the rejection path, which is where FO timing leaks usually occur.
 4. **Put a small budget in CI.** Test 7 and Test 13 alone, on the default parameter sets, run in minutes and cover the two notions that matter most.
 
 ## 13. How this maps to the NGCC first-round findings
@@ -601,7 +603,7 @@ Notes on the sketch:
 
 ## 15. Checklist for your own implementation
 
-Each item corresponds to a finding in the paper.
+Each item corresponds to a finding in the paper. The items add to sections B (KEM / FO), C (signatures), and E (API and memory) of the [NGCC pre-submission checklist](../pqc-implementation-guide/) in the earlier post.
 
 **Encoding**
 
@@ -640,14 +642,23 @@ Each item corresponds to a finding in the paper.
 ## Sources
 
 - Fenzi, Gilcher, Virdia, "Finding Bugs and Features Using Cryptographically-Informed Functional Testing", [TCHES 2026(1), pp. 425–447](https://doi.org/10.46586/tches.v2026.i1.425-447); [ePrint 2024/1122](https://eprint.iacr.org/2024/1122); [code and reproduction instructions](https://github.com/jangilcher/cryptoTesting) [source]
-- Mouha, Raunak, Kuhn, Kacker, "Finding Bugs in Cryptographic Hash Function Implementations", IEEE Transactions on Reliability 67(3), 2018
+- Mouha, Raunak, Kuhn, Kacker, "Finding Bugs in Cryptographic Hash Function Implementations", [IEEE Transactions on Reliability 67(3), 2018](https://doi.org/10.1109/TR.2018.2847247)
+- Weyuker, "On Testing Non-Testable Programs", [The Computer Journal 25(4), 1982](https://doi.org/10.1093/comjnl/25.4.465)
+- Chen, Cheung, Yiu, "Metamorphic Testing: A New Approach for Generating Next Test Cases", [arXiv:2002.12543](https://arxiv.org/abs/2002.12543) (technical report from 1998)
+- Chen, Tse, Zhou, "Fault-Based Testing Without the Need of Oracles", [Information and Software Technology 45(1), 2003](https://doi.org/10.1016/S0950-5849%2802%2900129-5)
+- Fioraldi, Maier, Eißfeldt, Heuse, "AFL++: Combining Incremental Steps of Fuzzing Research", [USENIX WOOT 2020](https://www.usenix.org/conference/woot20/presentation/fioraldi)
+- Gentry, Peikert, Vaikuntanathan, "Trapdoors for Hard Lattices and New Cryptographic Constructions", STOC 2008, [ePrint 2007/432](https://eprint.iacr.org/2007/432)
+- Fujisaki, Okamoto, "Secure Integration of Asymmetric and Symmetric Encryption Schemes", [CRYPTO 1999](https://doi.org/10.1007/3-540-48405-1_34)
+- Hofheinz, Hövelmanns, Kiltz, "A Modular Analysis of the Fujisaki-Okamoto Transformation", TCC 2017, [ePrint 2017/604](https://eprint.iacr.org/2017/604)
+- Pornin, Stern, "Digital Signatures Do Not Guarantee Exclusive Ownership", [ACNS 2005](https://doi.org/10.1007/11496137_10)
+- Reparaz, Balasch, Verbauwhede, "Dude, is my code constant time?", DATE 2017, [ePrint 2016/1123](https://eprint.iacr.org/2016/1123)
 - [NTRU fix: "Ensure trailing bits of ciphertext are 0"](https://github.com/jschanck/ntru/commit/6bb52396fed494001228ca579f4c1d91ef558171) [source]
 - [liboqs issue #1315: Malleable Falcon signatures](https://github.com/open-quantum-safe/liboqs/issues/1315) [source]
 - [CROSS-lib-oqs issue #1: Potential SUF-CMA violation](https://github.com/CROSS-signature/CROSS-lib-oqs/issues/1) [source]
 - [SUPERCOP report on KNOT-384 (archived)](https://web.archive.org/web/20200810000404/https:/bench.cr.yp.to/web-impl/amd64-pmnod003-crypto_hash-knot384.html)
-- Cremers, Düzlü, Fiedler, Fischlin, Janson, "BUFFing Signature Schemes Beyond Unforgeability and the Case of Post-Quantum Signatures", IEEE S&P 2021
-- Brendel, Cremers, Jackson, Zhao, "The Provable Security of Ed25519: Theory and Practice", IEEE S&P 2021
-- Jackson, Cremers, Cohn-Gordon, Sasse, "Seems Legit: Automated Analysis of Subtle Attacks on Protocols that Use Signatures", ACM CCS 2019
+- Cremers, Düzlü, Fiedler, Fischlin, Janson, "BUFFing Signature Schemes Beyond Unforgeability and the Case of Post-Quantum Signatures", IEEE S&P 2021, [ePrint 2020/1525](https://eprint.iacr.org/2020/1525)
+- Brendel, Cremers, Jackson, Zhao, "The Provable Security of Ed25519: Theory and Practice", IEEE S&P 2021, [ePrint 2020/823](https://eprint.iacr.org/2020/823)
+- Jackson, Cremers, Cohn-Gordon, Sasse, "Seems Legit: Automated Analysis of Subtle Attacks on Protocols that Use Signatures", ACM CCS 2019, [ePrint 2019/779](https://eprint.iacr.org/2019/779)
 - Kannwischer, Schwabe, Stebila, Wiggers, "Improving Software Quality in Cryptography Standardization Projects", [ePrint 2022/337](https://eprint.iacr.org/2022/337)
 - [Security analysis of KpqC first-round implementations, ePrint 2023/1437](https://eprint.iacr.org/2023/1437)
 - [FIPS 203 (ML-KEM)](https://csrc.nist.gov/pubs/fips/203/final) and [FIPS 204 (ML-DSA)](https://csrc.nist.gov/pubs/fips/204/final)

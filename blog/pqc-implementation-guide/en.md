@@ -15,6 +15,8 @@ This tutorial is for researchers who already write AVX2/AVX-512/NEON optimized c
 
 Note: links marked \[source\] were checked during this review. Unmarked statements are common knowledge in the field or approximate descriptions. Please verify against the original before citing.
 
+Follow-up post: test layer 6 in Section 7.1 (property and metamorphic testing) is covered in detail in [Flip One Bit: What Cryptographically-Informed Testing Finds in PQC Implementations](../crypto-informed-testing/). It includes a minimal test program for the bit-flip checks in checklist sections B and C.
+
 ## 1. A Short History of Standardization
 
 NIST took 8 years, from the 2016 call to the 2024 release of FIPS 203/204/205. In every round, some candidates were dropped for implementation or design problems. The NGCC first-round public review found a large number of issues within days. This shows that review tooling, especially AI-assisted review, has made "audited on submission" the norm.
@@ -200,7 +202,7 @@ IDs refer to the [ngcc.dev reports](https://ngcc.dev/reports/index.html).
 | 2. Wrong FO transform implementation | Implicit rejection ineffective; mask covers only some bytes; re-encryption comparison checks only part of the ciphertext; rejection key not bound to the full ciphertext | kem-01-1, kem-09-1, kem-18-1, kem-02-1 (compares only every 4th byte), kem-13-1 | Negative tests with invalid ciphertexts: after flipping each bit of the ciphertext, decapsulation must output a deterministic pseudorandom key that differs from the correct key |
 | 3. Randomness problems | KAT deterministic RNG left in the real code path; first encapsulation in a process is reproducible; ephemeral key generated only once; predictable signing randomness | kem-17-1/3, sign-12-1, sign-33-1/4, kex-02-1, kex-08-2 | Separate KAT RNG and production RNG at compile time; test that "two calls must produce different outputs" |
 | 4. Input parsing and memory safety | Malicious hint count causes stack writes; caller-declared length overflows a stack buffer; all-zero signature crashes or triggers an assert; verification result depends on uninitialized stack data; allocation failure returns success | sign-01-2, kem-14-1 (DTRU), sign-25-1, sign-27-1, sign-32-1/2, kem-10-1, kem-31-1, hash-02-1 | Fuzzing + ASan/UBSan/MSan; compare every external length against constants; failure paths return an error code by default and zero the output |
-| 5. Non-injective encoding / malleability | Signature padding bits not checked; hint encoding has multiple valid representations; public-key packing has aliases | sign-01-1, sign-07-1, sign-15-2, sign-11-5, sign-34-2 | "Decode → re-encode → byte-for-byte equal" as a precondition for verification; mutation tests targeting SUF-CMA |
+| 5. Non-injective encoding / malleability | Signature padding bits not checked; hint encoding has multiple valid representations; public-key packing has aliases | sign-01-1, sign-07-1, sign-15-2, sign-11-5, sign-34-2 | "Decode → re-encode → byte-for-byte equal" as a precondition for verification; mutation tests targeting SUF-CMA ([details](../crypto-informed-testing/)) |
 | 6. Code does not match the spec | Missing rounding constant; error polynomial discarded; a layer of error-correction decoding missing; address truncated to 8 bits; different hash instantiation | kem-24-1, kem-40-1, kem-39-2, kem-23-1, sign-04-2/3, sign-03-1 | Independent executable spec + differential testing of intermediate values (not just final outputs) |
 | 7. State management | Protocol state can be reset; state reuse leaks the key | kex-05-2; also the state-reuse issue in the Threshold ML-DSA reference code [source](https://www.projecteleven.com/blog/nine-schemes-advance-to-round-3-of-nists-additional-digital-signatures-process) | Make the state machine explicit; destroy state after use |
 | 8. Protocol-level omissions | Identity hard-coded to zero; malicious public key breaks contributiveness; raw shared value not passed through a KDF | kex-07-1, kem-13-2, kex-08-1 | KDF input includes the full transcript; model malicious peers |
@@ -272,7 +274,7 @@ Passing the KATs only proves agreement with the reference implementation on 100 
 | 3. Negative and boundary vectors | Public key above the modulus, wrong ciphertext length, tampered secret-key hash, "unlucky" vectors that read a lot of XOF output, vectors that fail if compared with strcmp | CCTV, [Wycheproof](https://github.com/C2SP/wycheproof), AWS-LC decapsulation validation vectors [source](https://pkg.go.dev/github.com/aws/aws-lc/util/vecgen) |
 | 4. Accumulated vectors | Millions of random tests, committing only a single hash value | [Accumulated Test Vectors](https://words.filippo.io/accumulated/): inputs generated deterministically with SHAKE128, all outputs absorbed into one hash |
 | 5. Differential testing | Optimized vs. reference vs. independent executable spec; at both the single-kernel level and the full API level | Custom framework; Sage/Python models |
-| 6. Property and metamorphic testing | Decaps(Encaps) consistency; decode-then-encode is the identity; flipping any bit of a ciphertext/signature must lead to rejection; two keygens produce different outputs | Metamorphic testing applied to KpqC [ePrint 2023/1437](https://eprint.iacr.org/2023/1437.pdf) |
+| 6. Property and metamorphic testing | Decaps(Encaps) consistency; decode-then-encode is the identity; flipping any bit of a ciphertext/signature must lead to rejection; two keygens produce different outputs | Metamorphic testing applied to KpqC [ePrint 2023/1437](https://eprint.iacr.org/2023/1437.pdf); a full walkthrough of the method in the [follow-up post](../crypto-informed-testing/) |
 | 7. Fuzzing | Robustness of parsers, verifiers, and decapsulation on arbitrary byte strings; differential fuzzing across implementations | libFuzzer, AFL++, honggfuzz; with ASan/UBSan/MSan |
 | 8. Memory and undefined behavior | Out-of-bounds access, uninitialized reads, integer overflow | Valgrind memcheck, sanitizers, `-fsanitize=integer`; stack-usage measurement (M4) |
 | 9. Cross-platform consistency | Big/little endian, 32/64-bit, different compilers | QEMU for s390x (big endian), i386, ARM; QEMU mps2-an386 for Cortex-M4 |
@@ -372,7 +374,7 @@ Each item below corresponds to a problem reported against at least one candidate
 
 **B. KEM / FO**
 
-- [ ] Bit-flipped ciphertexts: decapsulation outputs a deterministic pseudorandom key that differs from the correct key
+- [ ] Bit-flipped ciphertexts: decapsulation outputs a deterministic pseudorandom key that differs from the correct key (a test program for this is in the [follow-up post](../crypto-informed-testing/), Section 14)
 - [ ] The re-encryption comparison covers all ciphertext bytes and is constant time; the conditional copy covers all key bytes
 - [ ] The KDF input for the rejection key binds the full ciphertext
 - [ ] The decrypt→output path has no secret-dependent branches, divisions, or table lookups (compare with the "branch on decrypted coefficients" issue in kem-08-1)

@@ -15,6 +15,8 @@ Sep 25, 2026 · @jieyu
 
 说明：文中标注 \[source\] 的是本次检索核对过的链接；未标注的为领域常识或近似描述，引用前请复核原文。
 
+后续文章：第 7.1 节测试分层中的第 6 层（性质与变异测试）在[《翻转一个比特：密码学感知测试在 PQC 实现里找到了什么》](../crypto-informed-testing/?lang=zh)中有详细介绍，其中给出了一个最小测试程序，可用于第 9 节清单 B、C 中的比特翻转检查。
+
 ## 1. 标准化历史回顾
 
 NIST 从 2016 年征集到 2024 年发布 FIPS 203/204/205，用了 8 年；中间每一轮都有候选因实现或设计问题被淘汰。NGCC 首轮公开评审在几天内发现的问题数量，说明评审工具（尤其 AI 辅助）已使“提交即被审计”成为常态。
@@ -200,7 +202,7 @@ NGCC 首轮的 65 条实现类发现可以归入 9 类，几乎每一类在 NIST
 | 2. FO 变换实现错误 | 隐式拒绝无效；掩码只覆盖部分字节；重加密比对只比较部分密文；拒绝密钥未绑定完整密文 | kem-01-1、kem-09-1、kem-18-1、kem-02-1（只比较每第 4 字节）、kem-13-1 | 错误密文负向测试：对密文每一位翻转后，解封装必须输出确定性伪随机密钥且不等于正确密钥 |
 | 3. 随机数问题 | KAT 用确定性 RNG 遗留在实际路径；进程内第一次封装可复现；临时密钥只生成一次；签名随机性可预测 | kem-17-1/3、sign-12-1、sign-33-1/4、kex-02-1、kex-08-2 | KAT RNG 与生产 RNG 在编译期隔离；测试“两次调用输出必须不同” |
 | 4. 输入解析与内存安全 | 恶意 hint 计数导致栈写；调用者声明长度溢出栈缓冲区；全零签名崩溃或触发 assert；验证结果取决于未初始化栈数据；分配失败却返回成功 | sign-01-2、kem-14-1（DTRU）、sign-25-1、sign-27-1、sign-32-1/2、kem-10-1、kem-31-1、hash-02-1 | fuzz + ASan/UBSan/MSan；所有外部长度与常量比对；失败路径默认返回错误码并清零输出 |
-| 5. 编码非单射 / 可塑性 | 签名填充位未检查；hint 编码存在多种合法表示；公钥打包存在别名 | sign-01-1、sign-07-1、sign-15-2、sign-11-5、sign-34-2 | “解码 → 再编码 → 逐字节相等”作为验证前置条件；针对 SUF-CMA 的变异测试 |
+| 5. 编码非单射 / 可塑性 | 签名填充位未检查；hint 编码存在多种合法表示；公钥打包存在别名 | sign-01-1、sign-07-1、sign-15-2、sign-11-5、sign-34-2 | “解码 → 再编码 → 逐字节相等”作为验证前置条件；针对 SUF-CMA 的变异测试（[详见后续文章](../crypto-informed-testing/?lang=zh)） |
 | 6. 代码与 spec 不一致 | 遗漏舍入常数；丢弃误差多项式；缺少一层纠错译码；地址截断为 8 位；哈希实例化不同 | kem-24-1、kem-40-1、kem-39-2、kem-23-1、sign-04-2/3、sign-03-1 | 独立可执行规范 + 中间值差分（不只是最终输出） |
 | 7. 状态管理 | 协议状态可重置；状态重用泄露密钥 | kex-05-2；此外有 Threshold ML-DSA 参考代码的状态重用问题 [source](https://www.projecteleven.com/blog/nine-schemes-advance-to-round-3-of-nists-additional-digital-signatures-process) | 状态机显式化，使用后即销毁 |
 | 8. 协议级遗漏 | 身份硬编码为零；恶意公钥破坏贡献性；原始共享值未经 KDF | kex-07-1、kem-13-2、kex-08-1 | KDF 输入包含完整 transcript；对恶意对等方建模 |
@@ -272,7 +274,7 @@ KAT 通过只证明“在 NIST DRBG 生成的 100 组随机输入上与参考实
 | 3. 负向与边界向量 | 公钥超模、密文错误长度、私钥哈希被篡改、XOF 读取极多的“unlucky”向量、用 strcmp 比较就会失败的向量 | CCTV、[Wycheproof](https://github.com/C2SP/wycheproof)、AWS-LC 的解封装校验向量 [source](https://pkg.go.dev/github.com/aws/aws-lc/util/vecgen) |
 | 4. 累积向量 | 百万级随机测试只提交一个哈希值 | [Accumulated Test Vectors](https://words.filippo.io/accumulated/)：确定性 SHAKE128 生成输入，所有输出吸收进一个哈希 |
 | 5. 差分测试 | 优化实现 vs 参考实现 vs 独立可执行规范；单个内核级别 + 整体 API 级别 | 自建框架；Sage/Python 模型 |
-| 6. 性质与变异测试 | Decaps(Encaps) 一致；解码再编码不变；密文/签名逐位翻转必须被拒绝；两次 keygen 输出不同 | 变异测试（metamorphic）在 KpqC 上的应用 [ePrint 2023/1437](https://eprint.iacr.org/2023/1437.pdf) |
+| 6. 性质与变异测试 | Decaps(Encaps) 一致；解码再编码不变；密文/签名逐位翻转必须被拒绝；两次 keygen 输出不同 | 变异测试（metamorphic）在 KpqC 上的应用 [ePrint 2023/1437](https://eprint.iacr.org/2023/1437.pdf)；方法的完整介绍见[后续文章](../crypto-informed-testing/?lang=zh) |
 | 7. Fuzz | 解析器、验证器、解封装对任意字节串的鲁棒性；多实现差分 fuzz | libFuzzer、AFL++、honggfuzz；配合 ASan/UBSan/MSan |
 | 8. 内存与未定义行为 | 越界、未初始化读、整数溢出 | Valgrind memcheck、各 Sanitizer、`-fsanitize=integer`；栈用量测量（M4） |
 | 9. 跨平台一致性 | 大/小端、32/64 位、不同编译器 | QEMU 运行 s390x（大端）、i386、ARM；QEMU mps2-an386 运行 Cortex-M4 |
@@ -372,7 +374,7 @@ KAT 通过只证明“在 NIST DRBG 生成的 100 组随机输入上与参考实
 
 **B. KEM / FO**
 
-- [ ] 密文逐位翻转：解封装输出确定性伪随机密钥，且不等于正确密钥
+- [ ] 密文逐位翻转：解封装输出确定性伪随机密钥，且不等于正确密钥（测试程序见[后续文章](../crypto-informed-testing/?lang=zh)第 14 节）
 - [ ] 重加密比对覆盖全部密文字节，恒定时间，条件拷贝覆盖全部密钥字节
 - [ ] 拒绝密钥的 KDF 输入绑定完整密文
 - [ ] 解密→输出路径无任何秘密相关分支、除法、查表（对照 kem-08-1 的“解密系数分支”问题）
