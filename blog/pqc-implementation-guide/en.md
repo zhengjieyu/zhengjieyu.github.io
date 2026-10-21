@@ -374,7 +374,7 @@ Each item below corresponds to a problem reported against at least one candidate
 
 **B. KEM / FO**
 
-- [ ] Bit-flipped ciphertexts: decapsulation outputs a deterministic pseudorandom key that differs from the correct key (a test program for this is in the [follow-up post](../crypto-informed-testing/), Section 10.2)
+- [ ] Bit-flipped ciphertexts: decapsulation outputs a deterministic pseudorandom key that differs from the correct key (a test program for this is in the [follow-up post](../crypto-informed-testing/), Section 9)
 - [ ] The re-encryption comparison covers all ciphertext bytes and is constant time; the conditional copy covers all key bytes
 - [ ] The KDF input for the rejection key binds the full ciphertext
 - [ ] The decrypt→output path has no secret-dependent branches, divisions, or table lookups (compare with the "branch on decrypted coefficients" issue in kem-08-1)
