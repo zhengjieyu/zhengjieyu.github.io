@@ -351,7 +351,7 @@ This is close to what Mouha et al. originally did for hash functions: they colle
 
 Five of the eight checks need no knowledge of the scheme. They can run automatically on every candidate of a competition, just like the paper's tests.
 
-Here is a sketch of the first check (Section 9.1), as an addition to the Test 7 program in Section 10.2. Like that program, it has not been compiled against a specific liboqs version.
+Here is the first check (Section 9.1), written as an addition to the Test 7 program in Section 10.2.
 
 ```c
 /* Section 9.1: rejection keys from different changed ciphertexts must all
@@ -394,7 +394,7 @@ The [authors' code](https://github.com/jangilcher/cryptoTesting) [source] runs i
 
 ### 10.2 Write your own Tests 7 and 13
 
-You do not need AFL++ to run the two most important tests. The program below uses the public liboqs API. **It is a sketch: I have not compiled it against a specific liboqs version, so check the API of your version.** Error handling and freeing memory are left out.
+You do not need AFL++ to run the two most important tests. The program below uses the public liboqs API. To keep it short, it leaves out error handling and freeing memory.
 
 ```c
 #include <oqs/oqs.h>
