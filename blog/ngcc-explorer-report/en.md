@@ -16,19 +16,19 @@ For KEMs, X is **public key + ciphertext (bytes)** and Y is **decapsulation (cyc
 
 ## One measured trade-off
 
-The following records are all **128-bit KEM, Intel Core i7-12700, reference implementation**, with the same build profile and compiler flags. Cycles are rounded to whole numbers; sizes sum the public key and ciphertext.
+The following records are all **128-bit KEM, Intel Core i7-12700, reference implementation**, with the same build profile and compiler flags (a flag written twice, such as a repeated `-std=c99`, counts once). Cycles are rounded to whole numbers; sizes sum the public key and ciphertext.
 
 | Parameter set | Public key + ciphertext | Decapsulation |
 | --- | ---: | ---: |
+| NEV · NEV_512_769_C_ICCS | 1,127 B | 85,050 cycles |
 | BW-KEM · BW_KEM_C128 | 1,552 B | 338,701 cycles |
 | DKEM · DKEM-128 | 1,600 B | 254,308 cycles |
-| BRA · BRA-128 | 3,170 B | 50,590,354 cycles |
 
-BW-KEM transfers **48 fewer bytes** than DKEM. DKEM uses **about 84,393 fewer cycles** for decapsulation. Neither dominates the other on these axes: the smaller of the two is slower. BRA is larger and slower than both, so both are better alternatives to it on the selected metrics. “Better” here is an explicit **coordinate-by-coordinate comparison**, not an overall score for a scheme.
+BW-KEM transfers **48 fewer bytes** than DKEM. DKEM uses **about 84,393 fewer cycles** for decapsulation. Neither dominates the other on these axes: the smaller of the two is slower. NEV, however, is smaller and faster than both, so it is a better alternative to each of them on the selected metrics. “Better” here is an explicit **coordinate-by-coordinate comparison**, not an overall score for a scheme.
 
 ## What a Layer can tell us
 
-A record belongs to **Layer 1** when no record in its comparison group is no worse on both selected axes and strictly lower on at least one. Remove that layer and repeat to obtain Layer 2, Layer 3, and so on. BW-KEM and DKEM illustrate how the first layer can contain different trade-offs; BRA is kept off that first layer by better alternatives.
+A record belongs to **Layer 1** when no record in its comparison group is no worse on both selected axes and strictly lower on at least one. Remove that layer and repeat to obtain Layer 2, Layer 3, and so on. Two records that do not dominate each other are not necessarily on Layer 1. NEV is on Layer 1, while BW-KEM and DKEM both fall in Layer 6 because NEV and other records beat them.
 
 A Layer is **local to the current axes, filters, and comparison group**. The Explorer groups records by claimed strength, machine, implementation, build profile, and compiler flags before comparing them. Layer 1 points from separate groups do not form a site-wide winner list. Changing the axes or filters can change the layers. The 192- and 384-bit variants are currently outside this Layer analysis; records missing a selected metric or failing a relevant known-answer test are excluded too. Layer 1 only says that no qualifying alternative was found on these two costs. It cannot replace security analysis, side-channel evaluation, or a deployment-specific decision.
 

@@ -52,7 +52,7 @@ CTL transmits **133 fewer bytes** than NEV, while NEV decapsulates about **4.1 t
 
 ## What do other candidates show?
 
-The **128-bit signature** results in another shared reference build group on that x86 system also show a trade-off. YuanYang.DSA's `yuanyang-512` has a **561 B** signature and verifies in about **210,750 cycles**. `Rhyme-SHAKE-128` has a **1,483 B** signature and verifies in about **191,214 cycles**. Rhyme verifies slightly faster but its signature is **922 B larger**, so both records are in that group's first layer. The suffix in `yuanyang-512` is a parameter-set name; the **128-bit** grouping here comes from the site's claimed-strength data, not an inference from that suffix.
+The **128-bit signature** results in the main reference build group on that x86 system also show a trade-off. YuanYang.DSA's `yuanyang-512` has a **561 B** signature and verifies in about **210,750 cycles**. `Rhyme-SHAKE-128` has a **1,483 B** signature and verifies in about **191,214 cycles**. Rhyme verifies slightly faster but its signature is **922 B larger**, so both records are in that group's first layer. The suffix in `yuanyang-512` is a parameter-set name; the **128-bit** grouping here comes from the site's claimed-strength data, not an inference from that suffix.
 
 In the same group, `Rhyme-SM3-128` also has a **1,483 B** signature but takes about **338,813 cycles** to verify. It is therefore dominated by Rhyme-SHAKE on these two default metrics. This says nothing by itself about signing time, other hardware, or the schemes' security assumptions. The Explorer detail panel links to the original records.
 
@@ -62,18 +62,18 @@ To avoid drawing a conclusion from a few hand-picked examples, the table takes *
 
 | Primitive | Claimed strength | Records in group | Layer 1 in that group |
 | --- | ---: | ---: | --- |
-| KEM | 128-bit | 40 | CTL, NEV |
-| KEM | 256-bit | 40 | CTL, NEV (two parameter variants) |
-| KEM | 512-bit | 40 | NEV |
-| Signature | 128-bit | 37 | Facto-DSA, DARTS |
-| Signature | 256-bit | 30 | Facto-DSA, VDOO, DARTS |
-| Signature | 512-bit | 25 | DOVE, DARTS |
+| KEM | 128-bit | 47 | CTL, NEV |
+| KEM | 256-bit | 47 | CTL, NEV (two parameter variants) |
+| KEM | 512-bit | 47 | NEV |
+| Signature | 128-bit | 48 | Facto-DSA, Rhyme, YuanYang.DSA |
+| Signature | 256-bit | 41 | Facto-DSA, Rhyme, VDOO, YuanYang.DSA |
+| Signature | 512-bit | 36 | DOVE, YuanYang.DSA |
 
 The frontier **changes with primitive and claimed strength**, and often has more than one point. In the 256-bit KEM group, CTL transfers **2,236 B** and decapsulates in about **711,310 cycles**. A compressed NEV variant uses **2,253 B** and about **188,769 cycles**: 17 additional bytes coincide with roughly 522,500 fewer cycles. Another NEV variant uses **2,458 B** and about **186,622 cycles**: another 205 bytes save only about 2,147 cycles. The marginal trade-off differs greatly; an application must decide whether it is worthwhile. A single Layer 1 point in the *selected* 512-bit KEM build group still does not establish a winner across implementations or security considerations.
 
 Other compiler flags, implementations, and machines form different comparison groups. Their frontiers cannot be combined into a universal champion list. Claimed security strength is also not a cryptanalytic result.
 
-These examples support three practical observations: **smaller is not always faster**; one Layer can contain several meaningful trade-offs; and “dominated” means only that a better peer exists on the current two metrics. It does not mean a scheme is less secure, broken, or unsuitable for every deployment. Security analysis, side channels, memory, and protocol-specific key reuse require separate evaluation. A [companion snapshot report](../ngcc-explorer-report/) gives another KEM comparison from a different build group.
+These examples support three practical observations: **smaller is not always faster**; one Layer can contain several meaningful trade-offs; and “dominated” means only that a better peer exists on the current two metrics. It does not mean a scheme is less secure, broken, or unsuitable for every deployment. Security analysis, side channels, memory, and protocol-specific key reuse require separate evaluation. A [companion snapshot report](../ngcc-explorer-report/) gives another KEM comparison from the same group.
 
 ## A practical reading workflow
 
