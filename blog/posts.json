@@ -1,5 +1,18 @@
 [
   {
+    "slug": "ngcc-tradeoff-guide",
+    "date": "2026-10-22",
+    "readTime": 5,
+    "title": {
+      "en": "How to Read the Trade-off Layers in NGCC Explorer",
+      "zh": "怎么看 NGCC Explorer 的 Trade-off Layer"
+    },
+    "summary": {
+      "en": "Which two metrics are compared, what makes an option better, and why Layer 1 is a trade-off frontier rather than a winner.",
+      "zh": "从图上的 X/Y 指标出发，用具体数字解释更优选项和 Layer 1、2、3，说明为什么第一层不是综合第一名。"
+    }
+  },
+  {
     "slug": "crypto-informed-testing",
     "date": "2026-10-21",
     "readTime": 15,
