@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NGCC Explorer Report: Size and Speed — Jieyu Zheng</title>
+    <meta name="description" content="A snapshot report on NGCC Round 1 measurements, comparable KEM trade-offs, and Pareto layers.">
+    <link rel="icon" type="image/x-icon" href="../../images/favicon.ico">
+    <link rel="stylesheet" href="../../styles.css">
+
+    <!-- Prevent theme flash -->
+    <script>
+        (function() {
+            try {
+                var saved = localStorage.getItem('theme');
+                var theme = saved === 'dark' || saved === 'light' ? saved : 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+            } catch (e) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
+</head>
+<body class="bg-global-bg text-global-text antialiased">
+
+    <header id="main-header" class="group">
+        <div class="header-grid">
+            <div class="header-title">
+                <a href="../../" class="header-home"><span class="text-xl font-bold sm:text-2xl">Jieyu Zheng</span></a>
+            </div>
+
+            <nav class="mobile-nav-menu header-nav sm:flex sm:flex-row sm:items-center" id="navigation-menu">
+                <a href="../../#about">About</a>
+                <a href="../../#publications">Publications</a>
+                <a href="../../#education">Education</a>
+                <a href="../../#skills">Skills</a>
+                <a href="../../blog/" class="active" aria-current="page">Blog</a>
+            </nav>
+
+            <div class="header-controls flex items-center gap-3">
+                <!-- Language toggle -->
+                <button id="lang-toggle" aria-label="Switch to Chinese">中文</button>
+
+                <!-- Theme toggle -->
+                <button id="theme-toggle" aria-label="Switch to dark theme">
+                    <svg class="sun-icon h-4 w-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>
+                    </svg>
+                    <svg class="moon-icon h-4 w-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                    </svg>
+                </button>
+
+                <!-- Mobile menu toggle -->
+                <button id="toggle-navigation-menu" class="sm:hidden" aria-expanded="false" aria-label="Toggle navigation menu">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="mx-auto max-w-3xl px-4 sm:px-8">
+        <article class="mb-16">
+            <p class="post-back"><a href="../" data-i18n="back">← All posts</a></p>
+            <div class="prose post-body" id="blog-root" data-view="post" data-slug="ngcc-explorer-report">
+                <div class="loading-spinner">Loading…</div>
+            </div>
+        </article>
+    </main>
+
+    <div class="mx-auto max-w-3xl px-4 sm:px-8 py-8 text-center text-sm opacity-75">
+        <p>© 2026 Jieyu (婕妤) Zheng.</p>
+    </div>
+
+    <script src="../../assets/marked.min.js"></script>
+    <script src="../data.js"></script>
+    <script src="../../blog/blog.js?v=20261008-2"></script>
+    <script src="../../script.js"></script>
+</body>
+</html>

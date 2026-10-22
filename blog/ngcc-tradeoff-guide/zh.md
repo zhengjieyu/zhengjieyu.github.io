@@ -41,3 +41,5 @@ Layer 1 就是这两个指标下的 *Pareto frontier*（帕累托前沿）；后
 网站只比较**当前筛选后可见**、且声称安全强度处于同一个 128/256/512-bit 组、机器、实现版本、构建配置和编译参数都相同的结果。192-bit 和 384-bit 变体不参与这项比较。缺少任一轴的数据、没有比较组，或相关已知答案测试未通过的结果会显示为 *Unranked*。
 
 因此，切换方案筛选条件、机器、实现或坐标轴，都可能改变 Layer。不同机器上的 CPU cycles 也不能直接混成一个速度排行榜。有关大小、耗时和安全分组的原始来源与处理规则，可查看项目的 [Data and methods](https://github.com/zhengjieyu/ngcc-benchmark-explorer/blob/main/docs/DATA_AND_METHODS.md)。
+
+想看真实记录的对比，可以继续读 [NGCC Explorer 数据观察](../ngcc-explorer-report/?lang=zh)。

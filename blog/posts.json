@@ -1,5 +1,18 @@
 [
   {
+    "slug": "ngcc-explorer-report",
+    "date": "2026-10-22",
+    "readTime": 7,
+    "title": {
+      "en": "NGCC Explorer Report: Reading the Size–Speed Trade-off",
+      "zh": "NGCC Explorer 数据观察：大小与速度如何取舍"
+    },
+    "summary": {
+      "en": "A dated look at NGCC Round 1 data: what the default axes measure, a comparable KEM example, and what Pareto layers can tell us.",
+      "zh": "基于 NGCC Round 1 数据快照，用同组 KEM 的真实数字解释通信大小、解封装速度和 Pareto 分层。"
+    }
+  },
+  {
     "slug": "ngcc-tradeoff-guide",
     "date": "2026-10-22",
     "readTime": 5,

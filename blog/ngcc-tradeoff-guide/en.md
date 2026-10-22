@@ -41,3 +41,5 @@ Layer 1 is the *Pareto frontier* for the selected axes. Later layers are found b
 The Explorer makes these comparisons only among **currently visible results** with the same claimed 128-, 256-, or 512-bit security group, machine, implementation variant, build profile, and compiler flags. The 192- and 384-bit variants are outside this comparison. A result missing either selected measurement, lacking a comparison group, or failing the relevant known-answer test is shown as *Unranked*.
 
 Changing the scheme filters, machine, implementation, or axes can therefore change the layers. CPU cycles from different machines must not be read as one common speed ranking. For the exact source of sizes, timings, and security-group labels, see the project's [data and methods](https://github.com/zhengjieyu/ngcc-benchmark-explorer/blob/main/docs/DATA_AND_METHODS.md).
+
+For a data-backed example, read the [NGCC Explorer report](../ngcc-explorer-report/).
