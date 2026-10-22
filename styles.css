@@ -1475,3 +1475,28 @@ body:has(#about) .home-main #about { margin-inline: 0; }
   border: 1px solid var(--border);
   box-shadow: 0 16px 38px -28px rgba(0, 0, 0, .65);
 }
+
+
+/* Research tools */
+.project-card {
+  display: flex;
+  flex-direction: column;
+  gap: .55rem;
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: .9rem;
+  background: var(--surface);
+  color: var(--fg);
+  text-decoration: none;
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+.project-card:hover, .project-card:focus-visible {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .08);
+  opacity: 1;
+}
+.project-label { color: var(--accent); font-size: .72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.project-card strong { font-size: 1.5rem; letter-spacing: -.04em; }
+.project-card strong span { color: var(--accent); }
+.project-card > span:last-child { color: var(--fg-muted); font-size: .94rem; line-height: 1.6; }
