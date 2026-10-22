@@ -15,14 +15,14 @@
   {
     "slug": "ngcc-tradeoff-guide",
     "date": "2026-10-22",
-    "readTime": 5,
+    "readTime": 11,
     "title": {
-      "en": "How to Read the Trade-off Layers in NGCC Explorer",
-      "zh": "怎么看 NGCC Explorer 的 Trade-off Layer"
+      "en": "From NGCC Data to a Pareto Frontier: Using NGCC Explorer",
+      "zh": "从 NGCC 数据到 Pareto 前沿：如何使用 NGCC Explorer"
     },
     "summary": {
-      "en": "Which two metrics are compared, what makes an option better, and why Layer 1 is a trade-off frontier rather than a winner.",
-      "zh": "从图上的 X/Y 指标出发，用具体数字解释更优选项和 Layer 1、2、3，说明为什么第一层不是综合第一名。"
+      "en": "Why NGCC Explorer exists, how it uses ngcc-harness data, and what real KEM and signature measurements reveal about Pareto trade-offs.",
+      "zh": "介绍 NGCC Explorer 与 Signatures Zoo 的关系、ngcc-harness 数据来源，并用真实 KEM 与签名记录解释 Pareto 分层和方案取舍。"
     }
   },
   {
