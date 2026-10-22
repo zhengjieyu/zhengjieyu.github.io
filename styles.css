@@ -1476,6 +1476,15 @@ body:has(#about) .home-main #about { margin-inline: 0; }
   box-shadow: 0 16px 38px -28px rgba(0, 0, 0, .65);
 }
 
+/* Keep wide article tables readable without widening the page. */
+.table-wrap { -webkit-overflow-scrolling: touch; overscroll-behavior-inline: contain; }
+.table-scroll-hint { display: none; }
+@media (max-width: 639px) {
+  .post-body table { width: max-content; min-width: 100%; font-size: .82rem; }
+  .post-body th, .post-body td { padding: .55rem .65rem; }
+  .table-scroll-hint:not([hidden]) { display: block; margin: 0 0 .3rem; text-align: right; color: var(--fg-muted); font-size: .75rem; }
+}
+
 
 /* Research tools */
 .project-card {

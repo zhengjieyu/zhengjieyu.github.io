@@ -93,8 +93,17 @@
         el.querySelectorAll('table').forEach(t => {
             const wrap = document.createElement('div');
             wrap.className = 'table-wrap';
+            const hint = document.createElement('p');
+            hint.className = 'table-scroll-hint';
+            hint.textContent = postLang === 'zh' ? '表格可左右滑动 →' : 'Swipe to see more columns →';
+            hint.hidden = true;
+            t.parentNode.insertBefore(hint, t);
             t.parentNode.insertBefore(wrap, t);
             wrap.appendChild(t);
+            const update = () => { hint.hidden = wrap.scrollWidth <= wrap.clientWidth + 1; };
+            requestAnimationFrame(update);
+            document.fonts.ready.then(update);
+            new ResizeObserver(update).observe(wrap);
         });
 
         el.querySelectorAll('a[href^="http"]').forEach(a => {
