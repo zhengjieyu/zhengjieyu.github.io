@@ -11,7 +11,8 @@ body>#main-header,body>div.text-center { display:none; }
 [data-theme="light"] .world-stage:has(.chapter-lab:not([inert])) .world-shade,[data-theme="light"] .world-stage:has(.chapter-photos:not([inert])) .world-shade { opacity:.08; }
 #lattice-field { position:absolute;inset:0;width:100%;height:100%;z-index:-1; }
 .world-header { position:fixed;inset:0 0 auto;z-index:110;display:flex;align-items:center;justify-content:space-between;padding:1.5rem 3rem;color:#f9f5e9;mix-blend-mode:normal;background:linear-gradient(#0a1e2a99,transparent); }
-.world-brand { font:italic 2rem var(--font-display);color:inherit;text-decoration:none; }
+.world-brand { display:inline-flex;align-items:center;font:italic 2rem var(--font-display);color:inherit;text-decoration:none; }
+.world-brand-mark { display:block;width:40px;height:40px;flex-shrink:0; }
 .world-brand span { font: .7rem var(--font-mono);letter-spacing:.1em;margin-left:.8rem; }
 .world-header nav { display:flex;gap:1.6rem;align-items:center; }
 .world-header button,.text-action,.world-bottom button { border:0;background:none;color:inherit;font: .8rem/1.6 var(--font-mono);cursor:pointer;padding:.4rem 0; }

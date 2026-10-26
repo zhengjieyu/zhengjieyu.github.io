@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jieyu Zheng — Cryptography Engineering Researcher</title>
     <meta name="description" content="Jieyu Zheng is a cryptography engineering researcher working on post-quantum cryptography, efficient implementations, post-quantum TLS, and high-assurance cryptographic software.">
-    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    <link rel="icon" href="images/jz-favicon.ico" sizes="16x16 32x32 48x48 64x64">
+    <link rel="icon" type="image/svg+xml" href="images/jz-mark.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="images/jz-touch.png">
 
     <!-- CSS -->
     <link rel="stylesheet" href="styles.css?v=20261008-2">
@@ -44,6 +46,7 @@
                 <a href="#education">Education</a>
                 <a href="#skills">Skills</a>
                 <a href="#projects">Projects</a>
+                <a href="#service">Academic Service</a>
                 <a href="#blog">Blog</a>
             </nav>
 
@@ -280,27 +283,53 @@
         <section id="education" class="mb-16">
             <div class="section-heading">
                 <span class="section-eyebrow">02 / Background</span>
-                <h2>Education &amp; Experience</h2>
+                <h2>Education &amp;<br>Work Experience</h2>
                 <p>The places and people that have shaped my research.</p>
             </div>
+            <h3 class="experience-group-heading">Work &amp; Research</h3>
             <div class="background-grid">
+                <article class="background-card">
+                    <span class="background-type">Research position <span aria-hidden="true">↗</span></span>
+                    <div class="background-dates">Oct 2026 – Present</div>
+                    <h3>Open Security Research</h3>
+                    <p class="background-role">Post-Quantum Cryptography Researcher</p>
+                </article>
+                <article class="background-card">
+                    <span class="background-type">Research experience <span aria-hidden="true">↗</span></span>
+                    <div class="background-dates">Jul 2026 · One week</div>
+                    <h3>Ant Research</h3>
+                    <p class="background-role">ML-KEM performance optimization in Tongsuo</p>
+                    <p>Submitted two pull requests: one for x86-64 polynomial arithmetic and SHAKE acceleration, and one for cleansing sensitive sampling intermediates.</p>
+                    <ul class="experience-contributions" aria-label="Tongsuo contributions">
+                        <li><a href="https://github.com/Tongsuo-Project/Tongsuo/pull/829">PR #829 · ML-KEM acceleration ↗</a><span class="contribution-status">Merged</span></li>
+                        <li><a href="https://github.com/Tongsuo-Project/Tongsuo/pull/825">PR #825 · Sampling cleanup ↗</a><span class="contribution-status">Open</span></li>
+                    </ul>
+                    <p class="contribution-note">PR status checked on Oct 26, 2026.</p>
+                </article>
                 <article class="background-card">
                     <span class="background-type">Research experience <span aria-hidden="true">↗</span></span>
                     <div class="background-dates">2025</div>
                     <h3>Max Planck Institute for Security and Privacy</h3>
                     <p class="background-role">Research Intern · Feb – Jul 2025</p>
                     <p>Supervised by Peter Schwabe.</p>
+                    <p>Worked on extending Jasmin with AVX-512 instruction support. Contributed a register-allocation fix to the Jasmin compiler during this work.</p>
+                    <ul class="experience-contributions" aria-label="Jasmin compiler contribution">
+                        <li><a href="https://github.com/jasmin-lang/jasmin/pull/1159">PR #1159 · Register-allocation fix ↗</a><span class="contribution-status">Merged</span></li>
+                    </ul>
                 </article>
+            </div>
+            <h3 class="experience-group-heading">Education</h3>
+            <div class="background-grid">
                 <article class="background-card">
                     <span class="background-type">Doctorate <span aria-hidden="true">↗</span></span>
-                    <div class="background-dates">2021—26</div>
+                    <div class="background-dates">Sep 2021 – Jun 2026</div>
                     <h3>Fudan University</h3>
                     <p class="background-role">Ph.D. in Cyberspace Security</p>
                     <p>Post-quantum cryptography · Supervised by Yunlei Zhao.</p>
                 </article>
                 <article class="background-card">
                     <span class="background-type">Undergraduate <span aria-hidden="true">↗</span></span>
-                    <div class="background-dates">2017—21</div>
+                    <div class="background-dates">Sep 2017 – Jun 2021</div>
                     <h3>Nanchang University</h3>
                     <p class="background-role">B.S. in Information Security</p>
                 </article>
@@ -334,9 +363,25 @@
             </a>
         </section>
 
+        <section id="service" class="mb-16" aria-labelledby="service-title">
+            <div class="section-heading">
+                <span class="section-eyebrow">05 / Academic Service</span>
+                <h2 id="service-title">Academic <i>Service.</i></h2>
+                <p>Contributing to the research community through peer review.</p>
+            </div>
+            <h3 class="service-role">Reviewer</h3>
+            <ul class="service-list" aria-label="Peer-review service">
+                <li><span class="service-number" aria-hidden="true">01</span><div><h4>IEEE Internet of Things Journal</h4><span class="service-detail">IEEE IoTJ</span></div><span class="service-type">Journal</span></li>
+                <li><span class="service-number" aria-hidden="true">02</span><div><h4>IEEE Transactions on Dependable and Secure Computing</h4><span class="service-detail">IEEE TDSC</span></div><span class="service-type">Journal</span></li>
+                <li><span class="service-number" aria-hidden="true">03</span><div><h4>IEEE Networking Letters</h4></div><span class="service-type">Journal</span></li>
+                <li><span class="service-number" aria-hidden="true">04</span><div><h4>IEEE Network</h4></div><span class="service-type">Magazine</span></li>
+                <li><span class="service-number" aria-hidden="true">05</span><div><h4>Scientific Reports</h4><span class="service-detail">Springer Nature</span></div><span class="service-type">Journal</span></li>
+            </ul>
+        </section>
+
         <section id="blog" class="mb-16">
             <div class="section-heading">
-                <span class="section-eyebrow">05 / Writing</span>
+                <span class="section-eyebrow">06 / Writing</span>
                 <h2><a href="blog/" class="section-title-link">Blog <span aria-hidden="true">↗</span></a></h2>
                 <p>Notes and practical guides from cryptographic engineering.</p>
             </div>

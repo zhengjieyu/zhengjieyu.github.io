@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <title>Jieyu Zheng — JZ sea monogram</title>
+  <rect width="64" height="64" rx="15" fill="#12354A"/>
+  <path d="M13 21H28V37C28 43.1 24.5 47 19 47S10 43.1 10 38" stroke="#FFF8E8" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M37 21H53L36 44C42 41 47 41 53 44" stroke="#FFF8E8" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="49" cy="12" r="3" fill="#E6C58B"/>
+</svg>
