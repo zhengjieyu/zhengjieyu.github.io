@@ -4,19 +4,21 @@
     <!-- Meta Tags -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jieyu Zheng — Cryptography Researcher</title>
-    <meta name="description" content="PhD Candidate at Fudan University. Research in post-quantum cryptography and cryptographic engineering.">
+    <title>Jieyu Zheng — Cryptography Engineering Researcher</title>
+    <meta name="description" content="Jieyu Zheng is a cryptography engineering researcher working on post-quantum cryptography, efficient implementations, post-quantum TLS, and high-assurance cryptographic software.">
     <link rel="icon" type="image/x-icon" href="images/favicon.ico">
 
     <!-- CSS -->
     <link rel="stylesheet" href="styles.css?v=20261008-2">
+    <link rel="stylesheet" href="world.css">
+    <link rel="stylesheet" href="archive.css">
 
     <!-- Prevent theme flash -->
     <script>
         (function() {
             try {
                 var saved = localStorage.getItem('theme');
-                var theme = saved === 'dark' || saved === 'light' ? saved : 'dark';
+                var theme = saved === 'dark' || saved === 'light' ? saved : (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
                 document.documentElement.setAttribute('data-theme', theme);
             } catch (e) {
                 document.documentElement.setAttribute('data-theme', 'dark');
@@ -355,5 +357,7 @@
     <script src="blog/data.js"></script>
     <script src="blog/blog.js?v=20261008-2"></script>
     <script src="script.js"></script>
+    <script src="world.js"></script>
+    <script src="archive.js"></script>
 </body>
 </html>

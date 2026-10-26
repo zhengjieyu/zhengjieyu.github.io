@@ -1,7 +1,7 @@
 // Theme management
 class ThemeManager {
     constructor() {
-        this.theme = localStorage.getItem('theme') || 'dark';
+        this.theme = document.documentElement.getAttribute('data-theme') || 'light';
         this.init();
     }
 
@@ -19,7 +19,7 @@ class ThemeManager {
     setTheme(theme) {
         this.theme = theme;
         document.documentElement.setAttribute('data-theme', theme);
-        localStorage.setItem('theme', theme);
+        try { localStorage.setItem('theme', theme); } catch (e) { /* Private browsing may disable storage. */ }
         
         // Update theme toggle button aria-label
         const themeToggle = document.getElementById('theme-toggle');
@@ -388,6 +388,9 @@ class MarkdownLoader {
                     }
                     const parent = node.parentNode;
                     if (!parent) return NodeFilter.FILTER_REJECT;
+                    if (parent.closest && parent.closest('.world, .world-header, .world-dialog, .world-rotor')) {
+                        return NodeFilter.FILTER_REJECT;
+                    }
                     const tag = parent.nodeName;
                     if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'NOSCRIPT') {
                         return NodeFilter.FILTER_REJECT;
