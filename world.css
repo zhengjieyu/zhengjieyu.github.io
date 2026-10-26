@@ -23,6 +23,7 @@ body>#main-header,body>div.text-center { display:none; }
 .world-overline { font:.7rem var(--font-mono);letter-spacing:.23em;margin-bottom:2rem; }
 .chapter-intro h1 { font:400 clamp(5rem,10vw,10rem)/.87 var(--font-display);letter-spacing:-.055em;margin:0 0 2rem;color:inherit; }
 .chapter-intro h1 i { font-weight:400; }
+.world-chinese-name { display:inline-block;margin-left:1.1rem;font:400 clamp(1rem,2vw,1.6rem)/1.5 var(--font-display);letter-spacing:.18em;vertical-align:baseline;white-space:nowrap; }
 .world-local { font:1rem/1.6 var(--font-body);color:var(--world-dim); }
 .world-chapter .text-action { margin-top:1rem;border-bottom:1px solid currentColor;padding-bottom:.7rem; }
 .world-chapter h2 { font:400 clamp(3rem,5.5vw,5.5rem)/1.04 var(--font-display);letter-spacing:-.04em;color:inherit;margin:0 0 1.8rem; }

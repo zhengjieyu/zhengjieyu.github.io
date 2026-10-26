@@ -388,7 +388,7 @@ class MarkdownLoader {
                     }
                     const parent = node.parentNode;
                     if (!parent) return NodeFilter.FILTER_REJECT;
-                    if (parent.closest && parent.closest('.world, .world-header, .world-dialog, .world-rotor')) {
+                    if (parent.closest && parent.closest('.world, .world-header, .world-dialog, .world-rotor, .sea-subpage')) {
                         return NodeFilter.FILTER_REJECT;
                     }
                     const tag = parent.nodeName;

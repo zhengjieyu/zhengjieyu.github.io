@@ -79,6 +79,7 @@
 .archive-dialog .home-main #about .about-avatar { border-radius:1px;transform:rotate(-4deg);border:6px solid #eee7d6;box-shadow:0 10px 20px #0002;width:160px;height:190px;object-fit:cover; }
 .archive-dialog #about .about-header { margin:1rem 0 3rem; }
 .archive-dialog #about .title { font:400 3rem/1.1 var(--font-display);letter-spacing:-.045em; }
+.archive-dialog .about-chinese-name { display:inline-block;font-size:.45em;letter-spacing:.12em;white-space:nowrap; }
 .archive-dialog #about-content>p { font:1.08rem/1.85 var(--font-body);color:var(--archive-muted); }
 .archive-dialog .home-main #about .about-socials a { background:transparent;border:0;border-bottom:1px solid var(--archive-rule);border-radius:0;padding:.5rem 0;margin-right:.8rem;color:var(--archive-ink);font:.8rem/1.6 var(--font-mono);box-shadow:none; }
 .archive-dialog .home-main #about .about-socials a:hover { color:var(--archive-accent);border-color:currentColor; }

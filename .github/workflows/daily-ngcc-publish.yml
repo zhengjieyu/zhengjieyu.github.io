@@ -93,6 +93,8 @@ jobs:
           rm -rf site/ngcc-explorer
           mkdir -p site/ngcc-explorer
           cp -a explorer/build/. site/ngcc-explorer/
+          node site/scripts/integrate-explorer-branding.cjs
+          node site/scripts/test-explorer-branding.cjs
           python3 - <<'PY'
           import json
           from pathlib import Path

@@ -1,7 +1,7 @@
 <div class="about-header">
   <img src="images/profile.png" alt="Portrait of Jieyu Zheng" class="about-avatar" width="160" height="160" loading="lazy" />
   <div class="about-header-content">
-    <h1 class="title">Jieyu (婕妤) Zheng</h1>
+    <h1 class="title">Jieyu Zheng <span class="about-chinese-name" lang="zh">郑婕妤</span></h1>
     <div class="about-socials">
       <a href="https://scholar.google.com/citations?user=1wNJ7usAAAAJ&hl=zh-CN" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24" aria-hidden="true" style="width:14px;height:14px;" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
