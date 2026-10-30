@@ -1,5 +1,18 @@
 [
   {
+    "slug": "mldsa-memory-speed",
+    "date": "2026-10-30",
+    "readTime": 25,
+    "title": {
+      "en": "ML-DSA on Small Chips: How Far Plain C Gets You on Memory, Code Size and Speed",
+      "zh": "在小芯片上跑 ML-DSA：省内存、省代码、提速度，纯 C 能做到哪一步"
+    },
+    "summary": {
+      "en": "How to measure stack with painting, where ML-DSA signing spends its memory and time, and which plain-C techniques from papers and libraries save RAM, code or cycles, with the price of each.",
+      "zh": "用栈涂色测峰值，画出 ML-DSA 签名的内存和时间分布，再把论文与开源库里纯 C 能用的省内存、省代码、提速手段逐个拆开，标出每一项的代价。"
+    }
+  },
+  {
     "slug": "ngcc-explorer-report",
     "date": "2026-10-22",
     "readTime": 7,
